@@ -14,9 +14,11 @@ export class BoardService {
     private readonly playerGameService: PlayerGameService,
   ) {}
 
+  private readonly PLAYERS_COUNT = 2;
+
   async createGame(players: Player[]): Promise<number> {
-    if (players.length !== 2) {
-      throw new BadRequestException('A game must have exactly 2 players.');
+    if (players.length !== this.PLAYERS_COUNT) {
+      throw new BadRequestException(`A game must have exactly ${this.PLAYERS_COUNT} players.`);
     }
 
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
@@ -25,11 +27,16 @@ export class BoardService {
 
     await this.cellService.createCellsForNewGame(game.id);
 
-    return game.id;
+    return game.id; //dto
   }
 
   private async addPlayersToGame(gameId: number, players: Player[]): Promise<void> {
+    const symbols = [SymbolEnum.X, SymbolEnum.O];
 
+    for (let i = 0; i < players.length; i++) {
+      const isCurrentPlayer = i === 0;
+      await this.playerGameService.createPlayerGame(gameId, players[i].id, symbols[i], isCurrentPlayer);
+    }
   }
 
   async makeMove(gameId: number, position: number): Promise<void> {
@@ -41,7 +48,7 @@ export class BoardService {
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
 
-    await this.cellService.fillCell(gameId, position, currentPlayer.symbol as SymbolEnum);
+    await this.cellService.fillCell(gameId, position, currentPlayer.symbol);
 
     const cells = await this.boardRepository.getCellsByGame(gameId);
     const gameState = this.checkGameState(cells);
@@ -79,17 +86,14 @@ export class BoardService {
 
     const isDraw = cells.every((cell) => cell.symbol !== SymbolEnum.NULL);
 
-    if (isDraw) {
-      return GameStateEnum.DRAW;
-    }
-
-    return GameStateEnum.ONGOING;
+    return isDraw ? GameStateEnum.DRAW : GameStateEnum.ONGOING;
   }
 
   async getGameBoard(gameId: number): Promise<any> {
     const game = await this.boardRepository.getGameById(gameId);
     const cells = await this.boardRepository.getCellsByGame(gameId);
-    return { game, cells };
+
+    return { game, cells }; //function repository sql request
   }
 
   async resetGame(gameId: number): Promise<void> {

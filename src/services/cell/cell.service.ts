@@ -17,7 +17,7 @@ export class CellService {
     const cells = await this.cellRepository.getCellsByGame(gameId);
 
     for (const cell of cells) {
-      await this.cellRepository.updateCell(cell.id, SymbolEnum.NULL);
+      await this.cellRepository.updateCell(cell.id, SymbolEnum.NULL); //remove for, create function in repo (create many)
     }
   }
 

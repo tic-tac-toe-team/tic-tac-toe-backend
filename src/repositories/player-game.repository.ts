@@ -6,6 +6,12 @@ import { PlayerGame, Prisma } from '@prisma/client';
 export class PlayerGameRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async createPlayerGame(data: { gameId: number; symbol: string; isCurrentPlayer: boolean; playerId: number }): Promise<PlayerGame> {
+    return this.prisma.playerGame.create({
+      data,
+    });
+  }
+
   async findAllPlayersByGameId(gameId: number): Promise<PlayerGame[]> {
     return this.prisma.playerGame.findMany({
       where: { gameId },

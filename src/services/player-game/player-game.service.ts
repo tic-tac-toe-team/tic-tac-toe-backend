@@ -6,6 +6,15 @@ import { PlayerGameRepository } from '../../repositories/player-game.repository'
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
+  async createPlayerGame(gameId: number, playerId: number, symbol: string, isCurrentPlayer: boolean): Promise<PlayerGame> {
+    return this.playerGameRepository.createPlayerGame({
+      gameId,
+      symbol: symbol,
+      isCurrentPlayer,
+      playerId: playerId,
+    });
+  }
+
   async changeCurrentPlayer(gameId: number): Promise<PlayerGame> {
     const gamePlayers = await this.playerGameRepository.findAllPlayersByGameId(gameId);
 
