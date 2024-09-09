@@ -4,10 +4,11 @@ import { CellRepository } from '../../repositories/cell.repository';
 
 @Injectable()
 export class CellService {
+  private readonly TOTAL_CELLS = 9;
   constructor(private cellRepository: CellRepository) {}
 
   async createCellsForNewGame(gameId: number): Promise<void> {
-    for(let i = 0; i < 9; i++) {
+    for(let i = 0; i < this.TOTAL_CELLS; i++) {
       await this.cellRepository.createCell(gameId, i, SymbolEnum.NULL);
     }
   }
