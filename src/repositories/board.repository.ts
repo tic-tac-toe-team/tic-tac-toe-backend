@@ -1,10 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { GameStateEnum } from '../enums/game-state.enum';
+import { Game } from '@prisma/client';
 
 @Injectable()
 export class BoardRepository {
   constructor(private prisma: PrismaService) {}
+
+  async createGame(state: GameStateEnum): Promise<Game> {
+    return this.prisma.game.create({
+      data: {
+        state,
+      },
+    });
+  }
 
   async getGameById(id: number): Promise<any> {
     return this.prisma.game.findUnique({
