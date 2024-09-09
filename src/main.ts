@@ -9,7 +9,8 @@ async function bootstrap() {
     .setTitle('Tic-Tac-Toe API')
     .setDescription('API for the Tic-Tac-Toe game')
     .setVersion('1.0')
-    .addTag('players')
+    .addTag('auth')
+    .addTag('player')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
