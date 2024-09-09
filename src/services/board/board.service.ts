@@ -44,6 +44,7 @@ export class BoardService {
 
     for (const combination of winningCombinations) {
       const [a, b, c] = combination;
+
       if (
         cells[a].symbol !== SymbolEnum.NULL &&
         cells[a].symbol === cells[b].symbol &&
@@ -54,6 +55,7 @@ export class BoardService {
     }
 
     const isDraw = cells.every((cell) => cell.symbol !== SymbolEnum.NULL);
+
     if (isDraw) {
       return GameStateEnum.DRAW;
     }
