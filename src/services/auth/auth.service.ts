@@ -3,7 +3,6 @@ import { PlayerService } from '../player/player.service';
 import { CreatePlayerDto } from '../../dtos/create-player.dto';
 import { LoginPlayerDto } from '../../dtos/login-player.dto';
 import { Player } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 import { PlayerResponseDto } from '../../dtos/player-response.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CryptoService } from '../crypto.service';
@@ -52,21 +51,5 @@ export class AuthService {
     const access_token = this.jwtService.sign(payload);
 
     return new PlayerResponseDto(player.id, player.username, access_token);
-  }
-
-  async validateUser(username: string, password: string): Promise<PlayerResponseDto> {
-    const player = await this.playerService.getByUsername(username);
-
-    if (!player) {
-      return null;
-    }
-
-    const passwordValid = await bcrypt.compare(password, player.password);
-
-    if (!passwordValid) {
-      return null;
-    }
-
-    return new PlayerResponseDto(player.id, player.username);
   }
 }
