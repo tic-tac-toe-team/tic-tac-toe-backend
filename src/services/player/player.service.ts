@@ -2,30 +2,30 @@ import { Injectable } from '@nestjs/common';
 import { PlayerRepository } from '../../repositories/player.repository';
 import { Player } from '@prisma/client';
 import { CreatePlayerDto } from '../../dtos/create-player.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PlayerService {
   constructor(private readonly playerRepository: PlayerRepository) {}
 
-  async getPlayerById(id: number): Promise<Player> {
-    return this.playerRepository.findPlayerById(id);
+  async getById(id: number): Promise<Player> {
+    return this.playerRepository.findById(id);
   }
 
-  async getAllPlayers(): Promise<Player[]> {
-    return this.playerRepository.findAllPlayers();
+  async getByUsername(username: string): Promise<Player> {
+    return this.playerRepository.findByUsername(username);
   }
 
-  async createPlayer(createPlayerDto: CreatePlayerDto): Promise<Player> {
+  async getAll(): Promise<Player[]> {
+    return this.playerRepository.findAll();
+  }
+
+  async create(createPlayerDto: CreatePlayerDto): Promise<Player> {
     const { username, password } = createPlayerDto;
 
-    const saltOrRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
-
-    return this.playerRepository.createPlayer(username, hashedPassword);
+    return this.playerRepository.create(username, password);
   }
 
-  async deletePlayer(id: number): Promise<Player> {
-    return this.playerRepository.deletePlayer(id);
+  async delete(id: number): Promise<Player> {
+    return this.playerRepository.delete(id);
   }
 }

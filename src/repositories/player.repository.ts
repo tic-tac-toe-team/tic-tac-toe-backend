@@ -6,23 +6,29 @@ import { Player } from '@prisma/client';
 export class PlayerRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findPlayerById(id: number): Promise<Player> {
+  async findById(id: number): Promise<Player> {
     return this.prismaService.player.findUnique({
       where: { id },
     });
   }
 
-  async findAllPlayers(): Promise<Player[]> {
+  async findByUsername(username: string): Promise<Player> {
+    return this.prismaService.player.findUnique({
+      where: { username },
+    });
+  }
+
+  async findAll(): Promise<Player[]> {
     return this.prismaService.player.findMany();
   }
 
-  async createPlayer(username: string, password: string): Promise<Player> {
+  async create(username: string, password: string): Promise<Player> {
     return this.prismaService.player.create({
       data: { username, password },
     });
   }
 
-  async deletePlayer(id: number): Promise<Player> {
+  async delete(id: number): Promise<Player> {
     return this.prismaService.player.delete({
       where: { id },
     });
