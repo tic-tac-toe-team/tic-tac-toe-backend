@@ -24,6 +24,12 @@ export class CellRepository {
     });
   }
 
+  async getCellsByGame(gameId: number): Promise<any[]> {
+    return this.prisma.cell.findMany({
+      where: { gameId },
+    });
+  }
+
   async updateCell(id: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.update({
       where: { id },
@@ -31,15 +37,16 @@ export class CellRepository {
     });
   }
 
-  async deleteCell(id: number): Promise<any> {
-    return this.prisma.cell.delete({
-      where: { id },
+  async updateCells(gameId: number, symbol: SymbolEnum): Promise<any> {
+    return this.prisma.cell.updateMany({
+      where: { gameId },
+      data: { symbol: SymbolEnum[symbol] },
     });
   }
 
-  async getCellsByGame(gameId: number): Promise<any[]> {
-    return this.prisma.cell.findMany({
-      where: { gameId },
+  async deleteCell(id: number): Promise<any> {
+    return this.prisma.cell.delete({
+      where: { id },
     });
   }
 }

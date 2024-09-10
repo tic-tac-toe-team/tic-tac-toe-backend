@@ -8,17 +8,13 @@ export class CellService {
   constructor(private cellRepository: CellRepository) {}
 
   async createCellsForNewGame(gameId: number): Promise<void> {
-    for(let i = 0; i < this.TOTAL_CELLS; i++) {
+    for (let i = 0; i < this.TOTAL_CELLS; i++) {
       await this.cellRepository.createCell(gameId, i, SymbolEnum.NULL);
     }
   }
 
   async resetCells(gameId: number): Promise<void> {
-    const cells = await this.cellRepository.getCellsByGame(gameId);
-
-    for (const cell of cells) {
-      await this.cellRepository.updateCell(cell.id, SymbolEnum.NULL); //remove for, create function in repo (create many)
-    }
+    await this.cellRepository.updateCells(gameId, SymbolEnum.NULL);
   }
 
   async fillCell(gameId: number, position: number, symbol: SymbolEnum): Promise<void> {
@@ -29,5 +25,9 @@ export class CellService {
     } else {
       throw new Error('Cell is already occupied');
     }
+  }
+
+  async getCellsByGame(gameId: number): Promise<any[]> {
+    return await this.cellRepository.getCellsByGame(gameId);
   }
 }

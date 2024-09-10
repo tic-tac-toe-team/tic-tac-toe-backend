@@ -5,6 +5,7 @@ import { GameStateEnum } from '../../enums/game-state.enum';
 import { CellService } from '../cell/cell.service';
 import { PlayerGameService } from '../player-game/player-game.service';
 import { Player } from '@prisma/client';
+import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
 
 @Injectable()
 export class BoardService {
@@ -16,9 +17,11 @@ export class BoardService {
 
   private readonly PLAYERS_COUNT = 2;
 
-  async createGame(players: Player[]): Promise<number> {
+  async createGame(players: Player[]): Promise<CreateGameResponseDto> {
     if (players.length !== this.PLAYERS_COUNT) {
-      throw new BadRequestException(`A game must have exactly ${this.PLAYERS_COUNT} players.`);
+      throw new BadRequestException(
+        `A game must have exactly ${this.PLAYERS_COUNT} players.`,
+      );
     }
 
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
@@ -27,16 +30,12 @@ export class BoardService {
 
     await this.cellService.createCellsForNewGame(game.id);
 
-    return game.id; //dto
+    return { gameId: game.id };
   }
 
   private async addPlayersToGame(gameId: number, players: Player[]): Promise<void> {
-    const symbols = [SymbolEnum.X, SymbolEnum.O];
-
-    for (let i = 0; i < players.length; i++) {
-      const isCurrentPlayer = i === 0;
-      await this.playerGameService.createPlayerGame(gameId, players[i].id, symbols[i], isCurrentPlayer);
-    }
+    await this.playerGameService.createPlayerGame(gameId, players[0].id, SymbolEnum.X, true);
+    await this.playerGameService.createPlayerGame(gameId, players[1].id, SymbolEnum.O, false);
   }
 
   async makeMove(gameId: number, position: number): Promise<void> {
@@ -50,7 +49,7 @@ export class BoardService {
 
     await this.cellService.fillCell(gameId, position, currentPlayer.symbol);
 
-    const cells = await this.boardRepository.getCellsByGame(gameId);
+    const cells = await this.cellService.getCellsByGame(gameId);
     const gameState = this.checkGameState(cells);
 
     await this.boardRepository.updateGameState(gameId, gameState);
@@ -89,11 +88,14 @@ export class BoardService {
     return isDraw ? GameStateEnum.DRAW : GameStateEnum.ONGOING;
   }
 
-  async getGameBoard(gameId: number): Promise<any> {
-    const game = await this.boardRepository.getGameById(gameId);
-    const cells = await this.boardRepository.getCellsByGame(gameId);
+  async getGameBoard(gameId: number): Promise<any[]> {
+    return await this.cellService.getCellsByGame(gameId);
+  }
 
-    return { game, cells }; //function repository sql request
+  async getGameState(gameId: number): Promise<GameStateEnum> {
+    const game = await this.boardRepository.getGameById(gameId);
+
+    return game.state;
   }
 
   async resetGame(gameId: number): Promise<void> {
