@@ -5,13 +5,19 @@ import { LoginPlayerDto } from '../../dtos/login-player.dto';
 import { Player } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PlayerResponseDto } from '../../dtos/player-response.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly playerService: PlayerService) {}
+  constructor(
+    private readonly playerService: PlayerService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(createPlayerDto: CreatePlayerDto): Promise<Player> {
-    const existingPlayer = await this.playerService.getByUsername(createPlayerDto.username);
+    const existingPlayer = await this.playerService.getByUsername(
+      createPlayerDto.username,
+    );
 
     if (existingPlayer) {
       throw new BadRequestException('Username already exists');
@@ -21,19 +27,27 @@ export class AuthService {
   }
 
   async login(loginPlayerDto: LoginPlayerDto): Promise<PlayerResponseDto> {
-    const player = await this.playerService.getByUsername(loginPlayerDto.username);
+    const player = await this.playerService.getByUsername(
+      loginPlayerDto.username,
+    );
 
     if (!player) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials: User does not exist.');
     }
 
-    const passwordValid = await bcrypt.compare(loginPlayerDto.password, player.password);
+    const passwordValid = await bcrypt.compare(
+      loginPlayerDto.password,
+      player.password,
+    );
 
     if (!passwordValid) {
-      throw new UnauthorizedException('Incorrect password');
+      throw new UnauthorizedException('Invalid credentials: Incorrect password.');
     }
 
-    return new PlayerResponseDto(player.id, player.username);
+    const payload = { username: player.username, sub: player.id };
+    const access_token = this.jwtService.sign(payload);
+
+    return new PlayerResponseDto(player.id, player.username, access_token);
   }
 
   async validateUser(username: string, password: string): Promise<PlayerResponseDto> {
