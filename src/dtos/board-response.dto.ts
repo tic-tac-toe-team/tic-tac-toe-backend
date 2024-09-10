@@ -1,4 +1,4 @@
-export class CreateGameResponseDto {
+export class BoardResponseDto {
   gameId: number;
   state: string;
 }

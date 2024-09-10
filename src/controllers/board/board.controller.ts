@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { BoardService } from '../../services/board/board.service';
-import { Player } from '@prisma/client';
-import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CellResponseDto } from '../../dtos/cell-response.dto';
+import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
+import { BoardResponseDto } from '../../dtos/board-response.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -13,8 +14,13 @@ export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @Post('create')
-  async createGame(): Promise<CreateGameResponseDto> {
+  async createGame(): Promise<BoardResponseDto> {
     return await this.boardService.createGame();
+  }
+
+  @Post('create/:playerId')
+  async createGameWithPlayer(@Param('playerId', ParseIntPipe) playerId: number): Promise<PlayerGameResponseDto> {
+    return await this.boardService.createGameWithPlayer(playerId);
   }
 
   @Post(':gameId/move')
@@ -31,8 +37,8 @@ export class BoardController {
   }
 
   @Get(':gameId')
-  async getGameBoard(@Param('gameId') gameId: number): Promise<any[]> {
-    return this.boardService.getGameBoard(gameId);
+  async getGameBoard(@Param('gameId', ParseIntPipe) gameId: number): Promise<CellResponseDto[]> {
+    return await this.boardService.getGameBoard(gameId);
   }
 
   @Get(':gameId/state')

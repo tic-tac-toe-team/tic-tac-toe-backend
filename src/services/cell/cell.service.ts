@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SymbolEnum } from '../../enums/symbol.enum';
 import { CellRepository } from '../../repositories/cell.repository';
+import { CellResponseDto } from '../../dtos/cell-response.dto';
 
 @Injectable()
 export class CellService {
@@ -27,7 +28,7 @@ export class CellService {
     }
   }
 
-  async getCellsByGame(gameId: number): Promise<any[]> {
-    return await this.cellRepository.getCellsByGame(gameId);
+  async getCellsByGame(gameId: number): Promise<CellResponseDto[]> {
+    return  await this.cellRepository.getCellsByGame(gameId);
   }
 }
