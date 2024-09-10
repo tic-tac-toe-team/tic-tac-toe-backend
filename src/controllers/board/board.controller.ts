@@ -1,8 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { BoardService } from '../../services/board/board.service';
 import { Player } from '@prisma/client';
 import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@ApiTags('board')
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}

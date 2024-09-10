@@ -13,14 +13,25 @@ import { JwtStrategy } from './services/auth/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CryptoService } from './services/crypto.service';
+import { BoardController } from './controllers/board/board.controller';
+import { BoardService } from './services/board/board.service';
+import { BoardRepository } from './repositories/board.repository';
+import { CellRepository } from './repositories/cell.repository';
+import { PlayerGameRepository } from './repositories/player-game.repository';
+import { CellService } from './services/cell/cell.service';
+import { PlayerGameService } from './services/player-game/player-game.service';
 
 const controllers = [
   PlayerController,
   AuthController,
+  BoardController,
 ];
 
 const repositories = [
   PlayerRepository,
+  BoardRepository,
+  CellRepository,
+  PlayerGameRepository
 ];
 
 const services = [
@@ -30,7 +41,10 @@ const services = [
   LocalStrategy,
   LocalAuthGuard,
   JwtStrategy,
-  CryptoService
+  CryptoService,
+  BoardService,
+  CellService,
+  PlayerGameService,
 ];
 
 @Module({
