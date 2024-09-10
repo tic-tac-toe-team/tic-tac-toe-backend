@@ -1,13 +1,14 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { BoardService } from '../../services/board/board.service';
 import { Player } from '@prisma/client';
+import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
 
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @Post('create')
-  async createNewGame(@Body('players') players: Player[]): Promise<number> {
+  async createNewGame(@Body('players') players: Player[]): Promise<CreateGameResponseDto> {
     return this.boardService.createGame(players);
   }
 
@@ -25,7 +26,12 @@ export class BoardController {
   }
 
   @Get(':gameId')
-  async getGameBoard(@Param('gameId') gameId: number): Promise<any> {
+  async getGameBoard(@Param('gameId') gameId: number): Promise<any[]> {
     return this.boardService.getGameBoard(gameId);
+  }
+
+  @Get(':gameId/state')
+  async getGameState(@Param('gameId') gameId: number): Promise<any> {
+    return this.boardService.getGameState(gameId);
   }
 }

@@ -15,7 +15,7 @@ export class BoardRepository {
     });
   }
 
-  async getGameById(id: number): Promise<any> {
+  async getGameById(id: number): Promise<Game> {
     return this.prisma.game.findUnique({
       where: { id },
     });
@@ -25,12 +25,6 @@ export class BoardRepository {
     return this.prisma.game.update({
       where: { id },
       data: { state },
-    });
-  }
-
-  async getCellsByGame(gameId: number): Promise<any[]> {
-    return this.prisma.cell.findMany({
-      where: { gameId },
     });
   }
 }
