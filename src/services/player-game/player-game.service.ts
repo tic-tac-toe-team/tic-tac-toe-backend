@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PlayerGame } from '@prisma/client';
 import { PlayerGameRepository } from '../../repositories/player-game.repository';
+import { SymbolEnum } from '../../enums/symbol.enum';
 
 @Injectable()
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
-  async createPlayerGame(gameId: number, playerId: number, symbol: string, isCurrentPlayer: boolean): Promise<PlayerGame> {
+  async createPlayerGame(gameId: number, playerId: number, symbol: SymbolEnum, isCurrentPlayer: boolean): Promise<PlayerGame> {
     return this.playerGameRepository.createPlayerGame({
       gameId,
       symbol: symbol,

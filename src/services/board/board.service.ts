@@ -47,7 +47,7 @@ export class BoardService {
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
 
-    await this.cellService.fillCell(gameId, position, currentPlayer.symbol);
+    await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol as keyof typeof SymbolEnum]);
 
     const cells = await this.cellService.getCellsByGame(gameId);
     const gameState = this.checkGameState(cells);
@@ -92,7 +92,7 @@ export class BoardService {
     return await this.cellService.getCellsByGame(gameId);
   }
 
-  async getGameState(gameId: number): Promise<GameStateEnum> {
+  async getGameState(gameId: number): Promise<string> {
     const game = await this.boardRepository.getGameById(gameId);
 
     return game.state;
