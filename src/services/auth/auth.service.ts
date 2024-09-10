@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PlayerService } from '../player/player.service';
 import { CreatePlayerDto } from '../../dtos/create-player.dto';
 import { LoginPlayerDto } from '../../dtos/login-player.dto';
@@ -6,12 +6,14 @@ import { Player } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PlayerResponseDto } from '../../dtos/player-response.dto';
 import { JwtService } from '@nestjs/jwt';
+import { CryptoService } from '../crypto.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly playerService: PlayerService,
     private readonly jwtService: JwtService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async register(createPlayerDto: CreatePlayerDto): Promise<Player> {
@@ -22,6 +24,8 @@ export class AuthService {
     if (existingPlayer) {
       throw new BadRequestException('Username already exists');
     }
+
+    createPlayerDto.password = await this.cryptoService.hashPassword(createPlayerDto.password);
 
     return this.playerService.create(createPlayerDto);
   }
@@ -35,7 +39,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials: User does not exist.');
     }
 
-    const passwordValid = await bcrypt.compare(
+    const passwordValid = await this.cryptoService.comparePasswords(
       loginPlayerDto.password,
       player.password,
     );

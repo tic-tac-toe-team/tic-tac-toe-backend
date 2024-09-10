@@ -12,6 +12,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtStrategy } from './services/auth/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CryptoService } from './services/crypto.service';
 
 const controllers = [
   PlayerController,
@@ -29,6 +30,7 @@ const services = [
   LocalStrategy,
   LocalAuthGuard,
   JwtStrategy,
+  CryptoService
 ];
 
 @Module({
@@ -46,6 +48,7 @@ const services = [
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },],
+    },
+  ],
 })
 export class AppModule {}
