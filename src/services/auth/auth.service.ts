@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PlayerService } from '../player/player.service';
 import { CreatePlayerDto } from '../../dtos/create-player.dto';
-import { LoginPlayerDto } from '../../dtos/login-player.dto';
+import { LoginRequestDto } from '../../dtos/login-request.dto';
 import { Player } from '@prisma/client';
-import { PlayerResponseDto } from '../../dtos/player-response.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CryptoService } from '../crypto.service';
+import { LoginResponseDto } from '../../dtos/login-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +29,7 @@ export class AuthService {
     return this.playerService.create(createPlayerDto);
   }
 
-  async login(loginPlayerDto: LoginPlayerDto): Promise<PlayerResponseDto> {
+  async login(loginPlayerDto: LoginRequestDto): Promise<LoginResponseDto> {
     const player = await this.playerService.getByUsername(
       loginPlayerDto.username,
     );
@@ -50,6 +50,6 @@ export class AuthService {
     const payload = { username: player.username, sub: player.id };
     const access_token = this.jwtService.sign(payload);
 
-    return new PlayerResponseDto(player.id, player.username, access_token);
+    return new LoginResponseDto(player.id, player.username, access_token);
   }
 }
