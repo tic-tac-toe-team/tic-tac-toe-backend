@@ -13,8 +13,8 @@ export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @Post('create')
-  async createNewGame(@Body('players') players: Player[]): Promise<CreateGameResponseDto> {
-    return this.boardService.createGame(players);
+  async createGame(): Promise<CreateGameResponseDto> {
+    return await this.boardService.createGame();
   }
 
   @Post(':gameId/move')

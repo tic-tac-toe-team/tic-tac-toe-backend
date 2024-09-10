@@ -15,22 +15,29 @@ export class BoardService {
     private readonly playerGameService: PlayerGameService,
   ) {}
 
-  private readonly PLAYERS_COUNT = 2;
+  // private readonly PLAYERS_COUNT = 2;
+  // async createGame(players: Player[]): Promise<CreateGameResponseDto> {
+  //   if (players.length !== this.PLAYERS_COUNT) {
+  //     throw new BadRequestException(
+  //       `A game must have exactly ${this.PLAYERS_COUNT} players.`,
+  //     );
+  //   }
+  //
+  //   const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
+  //
+  //   await this.addPlayersToGame(game.id, players);
+  //
+  //   await this.cellService.createCellsForNewGame(game.id);
+  //
+  //   return { gameId: game.id };
+  // }
 
-  async createGame(players: Player[]): Promise<CreateGameResponseDto> {
-    if (players.length !== this.PLAYERS_COUNT) {
-      throw new BadRequestException(
-        `A game must have exactly ${this.PLAYERS_COUNT} players.`,
-      );
-    }
-
+  async createGame(): Promise<CreateGameResponseDto> {
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
-
-    await this.addPlayersToGame(game.id, players);
 
     await this.cellService.createCellsForNewGame(game.id);
 
-    return { gameId: game.id };
+    return { gameId: game.id, state: game.state };
   }
 
   private async addPlayersToGame(gameId: number, players: Player[]): Promise<void> {
