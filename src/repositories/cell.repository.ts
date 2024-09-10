@@ -8,7 +8,7 @@ export class CellRepository {
 
   async createCell(gameId: number, position: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.create({
-      data: { position, symbol: SymbolEnum[symbol], gameId },
+      data: { position, gameId, symbol },
     });
   }
 
