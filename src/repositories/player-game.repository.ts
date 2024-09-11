@@ -12,7 +12,7 @@ export class PlayerGameRepository {
     });
   }
 
-  async findPlayerGameByGameAndPlayer(gameId: number, playerId: number): Promise<PlayerGame | null> {
+  async findByGameIdAndPlayerId(gameId: number, playerId: number): Promise<PlayerGame | null> {
     return this.prisma.playerGame.findFirst({
       where: { gameId, playerId },
     });

@@ -7,7 +7,7 @@ import { SymbolEnum } from '../../enums/symbol.enum';
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
-  async createPlayerGame(data: { gameId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
+  async create(data: { gameId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
     return this.playerGameRepository.createPlayerGame(data);
   }
 
@@ -67,7 +67,7 @@ export class PlayerGameService {
   }
 
   async removeFromGame(gameId: number, playerId: number): Promise<{ message: string }> {
-    const playerGame = await this.playerGameRepository.findPlayerGameByGameAndPlayer(gameId, playerId);
+    const playerGame = await this.playerGameRepository.findByGameIdAndPlayerId(gameId, playerId);
 
     if (!playerGame) {
       throw new BadRequestException('Player not found in this game.');

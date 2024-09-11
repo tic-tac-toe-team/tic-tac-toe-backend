@@ -4,7 +4,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CellResponseDto } from '../../dtos/cell-response.dto';
 import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
-import { BoardResponseDto } from '../../dtos/board-response.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -13,14 +12,9 @@ import { BoardResponseDto } from '../../dtos/board-response.dto';
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
-  @Post('create')
-  async createGame(): Promise<BoardResponseDto> {
-    return await this.boardService.createGame();
-  }
-
   @Post('create/:playerId')
-  async createGameWithPlayer(@Param('playerId', ParseIntPipe) playerId: number): Promise<PlayerGameResponseDto> {
-    return await this.boardService.createGameWithPlayer(playerId);
+  async createGame(@Param('playerId', ParseIntPipe) playerId: number): Promise<PlayerGameResponseDto> {
+    return await this.boardService.createGame(playerId);
   }
 
   @Post('join/:gameId/:playerId')

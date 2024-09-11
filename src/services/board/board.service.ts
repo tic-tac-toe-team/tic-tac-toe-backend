@@ -16,18 +16,10 @@ export class BoardService {
     private readonly playerGameService: PlayerGameService,
   ) {}
 
-  async createGame(): Promise<BoardResponseDto> {
+  async createGame(playerId: number): Promise<PlayerGameResponseDto> {
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
 
-    await this.cellService.createCellsForNewGame(game.id);
-
-    return { gameId: game.id, state: game.state };
-  }
-
-  async createGameWithPlayer(playerId: number): Promise<PlayerGameResponseDto> {
-    const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
-
-    const playerGame = await this.playerGameService.createPlayerGame({
+    const playerGame = await this.playerGameService.create({
       gameId: game.id,
       playerId: playerId,
       symbol: SymbolEnum.X,
@@ -55,7 +47,7 @@ export class BoardService {
 
     const symbol = this.playerGameService.determinePlayerSymbol(players);
 
-    const playerGame = await this.playerGameService.createPlayerGame({
+    const playerGame = await this.playerGameService.create({
       gameId,
       playerId,
       symbol,
