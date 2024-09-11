@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PlayerService } from '../player/player.service';
-import { CreatePlayerRequestDto } from '../../dtos/create-player-request.dto';
-import { LoginRequestDto } from '../../dtos/login-request.dto';
+import { PlayerService } from './player.service';
+import { CreatePlayerRequestDto } from '../dtos/create-player-request.dto';
+import { LoginRequestDto } from '../dtos/login-request.dto';
 import { JwtService } from '@nestjs/jwt';
-import { CryptoService } from '../crypto.service';
-import { LoginResponseDto } from '../../dtos/login-response.dto';
-import { CreatePlayerResponseDto } from '../../dtos/create-player-response.dto';
+import { CryptoService } from './crypto.service';
+import { LoginResponseDto } from '../dtos/login-response.dto';
+import { CreatePlayerResponseDto } from '../dtos/create-player-response.dto';
 
 @Injectable()
 export class AuthService {

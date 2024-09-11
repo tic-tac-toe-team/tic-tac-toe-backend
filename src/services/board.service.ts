@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { BoardRepository } from '../../repositories/board.repository';
-import { SymbolEnum } from '../../enums/symbol.enum';
-import { GameStateEnum } from '../../enums/game-state.enum';
-import { CellService } from '../cell/cell.service';
-import { PlayerGameService } from '../player-game/player-game.service';
-import { CellResponseDto } from '../../dtos/cell-response.dto';
-import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
+import { BoardRepository } from '../repositories/board.repository';
+import { SymbolEnum } from '../enums/symbol.enum';
+import { GameStateEnum } from '../enums/game-state.enum';
+import { CellService } from './cell.service';
+import { PlayerGameService } from './player-game.service';
+import { CellResponseDto } from '../dtos/cell-response.dto';
+import { PlayerGameResponseDto } from '../dtos/player-game-response.dto';
 
 @Injectable()
 export class BoardService {
