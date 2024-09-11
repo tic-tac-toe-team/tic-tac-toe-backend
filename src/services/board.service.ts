@@ -39,7 +39,7 @@ export class BoardService {
     };
   }
 
-  async joinGame(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
+  async joinPlayerToGame(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
     const players = await this.playerGameService.getPlayersInGame(gameId);
 
     if (players.length >= 2) {
@@ -48,7 +48,7 @@ export class BoardService {
 
     this.playerGameService.checkPlayerInGame(players, playerId);
 
-    const symbol = this.playerGameService.determinePlayerSymbol(players);
+    const symbol = this.playerGameService.determinePlayersSymbol(players);
 
     const playerGame = await this.playerGameService.create({
       gameId,
@@ -65,8 +65,8 @@ export class BoardService {
     };
   }
 
-  async leaveGame(gameId: number, playerId: number): Promise<{ message: string }> {
-    return this.playerGameService.removeFromGame(gameId, playerId);
+  async leaveGame(gameId: number, playerId: number): Promise<void> {
+    // return this.playerGameService.removeFromGame(gameId, playerId);
   }
 
   async makeMove(gameId: number, position: number): Promise<void> {

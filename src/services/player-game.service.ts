@@ -58,7 +58,7 @@ export class PlayerGameService {
     }
   }
 
-  determinePlayerSymbol(players: PlayerGame[]): SymbolEnum {
+  determinePlayersSymbol(players: PlayerGame[]): SymbolEnum {
     const isSinglePlayerInGame = players.length === 1;
 
     return isSinglePlayerInGame
