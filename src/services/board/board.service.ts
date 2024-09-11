@@ -44,7 +44,33 @@ export class BoardService {
     };
   }
 
+  async joinGame(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
+    const playersInGame = await this.playerGameService.getPlayersInGame(gameId);
 
+    if (playersInGame.length >= 2) {
+      throw new BadRequestException('This game already has two players. A third player cannot join.');
+    }
+
+    const isPlayerAlreadyInGame = playersInGame.some(player => player.playerId === playerId);
+
+    if (isPlayerAlreadyInGame) {
+      throw new BadRequestException('This player is already part of the game.');
+    }
+
+    const playerGame = await this.playerGameService.createPlayerGame({
+      gameId,
+      playerId,
+      symbol: SymbolEnum.O,
+      isCurrentPlayer: false,
+    });
+
+    return {
+      gameId: playerGame.gameId,
+      playerId: playerGame.playerId,
+      symbol: playerGame.symbol,
+      isCurrentPlayer: playerGame.isCurrentPlayer,
+    };
+  }
 
   async makeMove(gameId: number, position: number): Promise<void> {
     const game = await this.boardRepository.getGameById(gameId);

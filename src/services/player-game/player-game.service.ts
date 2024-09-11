@@ -45,4 +45,8 @@ export class PlayerGameService {
 
     return currentPlayer;
   }
+
+  async getPlayersInGame(gameId: number): Promise<PlayerGame[]> {
+    return await this.playerGameRepository.findAllPlayersByGameId(gameId);
+  }
 }

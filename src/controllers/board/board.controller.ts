@@ -23,6 +23,14 @@ export class BoardController {
     return await this.boardService.createGameWithPlayer(playerId);
   }
 
+  @Post('join/:gameId/:playerId')
+  async joinGame(
+    @Param('gameId', ParseIntPipe) gameId: number,
+    @Param('playerId', ParseIntPipe) playerId: number,
+  ): Promise<PlayerGameResponseDto> {
+    return await this.boardService.joinGame(gameId, playerId);
+  }
+
   @Post(':gameId/move')
   async makeMove(
     @Param('gameId') gameId: number,
