@@ -7,13 +7,8 @@ import { SymbolEnum } from '../../enums/symbol.enum';
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
-  async createPlayerGame(gameId: number, playerId: number, symbol: SymbolEnum, isCurrentPlayer: boolean): Promise<PlayerGame> {
-    return this.playerGameRepository.createPlayerGame({
-      gameId,
-      symbol: symbol,
-      isCurrentPlayer,
-      playerId: playerId,
-    });
+  async create(data: { gameId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
+    return this.playerGameRepository.createPlayerGame(data);
   }
 
   async changeCurrentPlayer(gameId: number): Promise<PlayerGame> {
@@ -49,5 +44,36 @@ export class PlayerGameService {
     }
 
     return currentPlayer;
+  }
+
+  async getPlayersInGame(gameId: number): Promise<PlayerGame[]> {
+    return await this.playerGameRepository.findAllPlayersByGameId(gameId);
+  }
+
+  checkPlayerInGame(players: PlayerGame[], playerId: number): void {
+    const isPlayerAlreadyInGame = players.some(player => player.playerId === playerId);
+
+    if (isPlayerAlreadyInGame) {
+      throw new BadRequestException('This player is already part of the game.');
+    }
+  }
+
+  determinePlayerSymbol(players: PlayerGame[]): SymbolEnum {
+    const isSinglePlayerInGame = players.length === 1;
+
+    return isSinglePlayerInGame
+      ? (players[0].symbol === SymbolEnum.X ? SymbolEnum.O : SymbolEnum.X)
+      : SymbolEnum.X;
+  }
+
+  async removeFromGame(gameId: number, playerId: number): Promise<{ message: string }> {
+    const playerGame = await this.playerGameRepository.findByGameIdAndPlayerId(gameId, playerId);
+
+    if (!playerGame) {
+      throw new BadRequestException('Player not found in this game.');
+    }
+    await this.playerGameRepository.deletePlayerFromGame(gameId, playerId);
+
+    return { message: `Player with ID ${playerId} successfully left the game with ID ${gameId}` };
   }
 }

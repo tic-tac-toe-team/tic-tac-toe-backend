@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class CreatePlayerDto {
+export class CreatePlayerRequestDto {
   @IsString()
   @IsNotEmpty()
   username: string;

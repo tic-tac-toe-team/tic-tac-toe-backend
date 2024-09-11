@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { BoardService } from '../../services/board/board.service';
-import { Player } from '@prisma/client';
-import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { CreateGameDto } from '../../dtos/create-game-request.dto';
+import { CellResponseDto } from '../../dtos/cell-response.dto';
+import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -13,26 +12,33 @@ import { CreateGameDto } from '../../dtos/create-game-request.dto';
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
-  @Post('create')
-  @ApiBody({ type: CreateGameDto })
-  async createNewGame(@Body() createGameDto: CreateGameDto): Promise<CreateGameResponseDto> {
-    return this.boardService.createGame(createGameDto.playerOneId, createGameDto.playerTwoId);
+  @Post('create/:playerId')
+  async createGame(@Param('playerId', ParseIntPipe) playerId: number): Promise<PlayerGameResponseDto> {
+    return await this.boardService.createGame(playerId);
   }
 
-  @Get('all')
-  async getAllGames(): Promise<any[]> {
-    return this.boardService.getAllGames();
+  @Post('join/:gameId/:playerId')
+  async joinGame(
+    @Param('gameId', ParseIntPipe) gameId: number,
+    @Param('playerId', ParseIntPipe) playerId: number,
+  ): Promise<PlayerGameResponseDto> {
+    return await this.boardService.joinGame(gameId, playerId);
   }
 
-  @Post(':gameId/position/move')
+  @Post('leave/:gameId/:playerId')
+  async leaveGame(
+    @Param('gameId', ParseIntPipe) gameId: number,
+    @Param('playerId', ParseIntPipe) playerId: number,
+  ): Promise<{ message: string }> {
+    return await this.boardService.leaveGame(gameId, playerId);
+  }
+
+  @Post(':gameId/move')
   async makeMove(
-    @Param('gameId') gameId: string,
-    @Param('position') position: string,
+    @Param('gameId') gameId: number,
+    @Body('position') position: number,
   ): Promise<void> {
-    const parsedGameId = parseInt(gameId, 10);
-    const parsedPosition = parseInt(position, 10);
-
-    await this.boardService.makeMove(parsedGameId, parsedPosition);
+    await this.boardService.makeMove(gameId, position);
   }
 
   @Post(':gameId/restart')
@@ -41,12 +47,12 @@ export class BoardController {
   }
 
   @Get(':gameId')
-  async getGameBoard(@Param('gameId') gameId: string): Promise<any[]> {
-    return this.boardService.getGameBoard(parseInt(gameId, 10));
+  async getGameBoard(@Param('gameId', ParseIntPipe) gameId: number): Promise<CellResponseDto[]> {
+    return await this.boardService.getGameBoard(gameId);
   }
 
   @Get(':gameId/state')
-  async getGameState(@Param('gameId') gameId: string): Promise<any> {
-    return this.boardService.getGameState(parseInt(gameId, 10));
+  async getGameState(@Param('gameId') gameId: number): Promise<any> {
+    return this.boardService.getGameState(gameId);
   }
 }

@@ -4,8 +4,9 @@ import { SymbolEnum } from '../../enums/symbol.enum';
 import { GameStateEnum } from '../../enums/game-state.enum';
 import { CellService } from '../cell/cell.service';
 import { PlayerGameService } from '../player-game/player-game.service';
-import { Player } from '@prisma/client';
-import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
+import { CellResponseDto } from '../../dtos/cell-response.dto';
+import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
+import { BoardResponseDto } from '../../dtos/board-response.dto';
 
 @Injectable()
 export class BoardService {
@@ -15,50 +16,55 @@ export class BoardService {
     private readonly playerGameService: PlayerGameService,
   ) {}
 
-  private readonly PLAYERS_COUNT = 2;
-
-  async getAllGames(): Promise<any[]> {
-    return this.boardRepository.getAllGames();
-  }
-
-  // async createGame(players: Player[]): Promise<CreateGameResponseDto> {
-  //   if (players.length !== this.PLAYERS_COUNT) {
-  //     throw new BadRequestException(
-  //       `A game must have exactly ${this.PLAYERS_COUNT} players.`,
-  //     );
-  //   }
-  //
-  //   const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
-  //
-  //   await this.addPlayersToGame(game.id, players);
-  //
-  //   await this.cellService.createCellsForNewGame(game.id);
-  //
-  //   return { gameId: game.id };
-  // }
-
-  async createGame(playerOneId: number, playerTwoId: number): Promise<CreateGameResponseDto> {
-    if (!playerOneId || !playerTwoId) {
-      throw new BadRequestException(`The IDs of two players must be transmitted.`);
-    }
-
+  async createGame(playerId: number): Promise<PlayerGameResponseDto> {
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
 
-    await this.addPlayersToGame(game.id, playerOneId, playerTwoId);
+    const playerGame = await this.playerGameService.create({
+      gameId: game.id,
+      playerId: playerId,
+      symbol: SymbolEnum.X,
+      isCurrentPlayer: true,
+    });
 
     await this.cellService.createCellsForNewGame(game.id);
 
-    return { gameId: game.id };
+    return {
+      gameId: game.id,
+      playerId: playerGame.playerId,
+      symbol: playerGame.symbol,
+      isCurrentPlayer: playerGame.isCurrentPlayer,
+    };
   }
 
-  private async addPlayersToGame(gameId: number, playerOneId: number, playerTwoId: number): Promise<void> {
-    await this.playerGameService.createPlayerGame(gameId, playerOneId, SymbolEnum.X, true);
-    await this.playerGameService.createPlayerGame(gameId, playerTwoId, SymbolEnum.O, false);
+  async joinGame(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
+    const players = await this.playerGameService.getPlayersInGame(gameId);
+
+    if (players.length >= 2) {
+      throw new BadRequestException('This game already has two players. A third player cannot join.');
+    }
+
+    this.playerGameService.checkPlayerInGame(players, playerId);
+
+    const symbol = this.playerGameService.determinePlayerSymbol(players);
+
+    const playerGame = await this.playerGameService.create({
+      gameId,
+      playerId,
+      symbol,
+      isCurrentPlayer: false,
+    });
+
+    return {
+      gameId: playerGame.gameId,
+      playerId: playerGame.playerId,
+      symbol: playerGame.symbol,
+      isCurrentPlayer: playerGame.isCurrentPlayer,
+    };
   }
-  // private async addPlayersToGame(gameId: number, players: Player[]): Promise<void> {
-  //   await this.playerGameService.createPlayerGame(gameId, players[0].id, SymbolEnum.X, true);
-  //   await this.playerGameService.createPlayerGame(gameId, players[1].id, SymbolEnum.O, false);
-  // }
+
+  async leaveGame(gameId: number, playerId: number): Promise<{ message: string }> {
+    return this.playerGameService.removeFromGame(gameId, playerId);
+  }
 
   async makeMove(gameId: number, position: number): Promise<void> {
     const game = await this.boardRepository.getGameById(gameId);
@@ -69,7 +75,7 @@ export class BoardService {
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
 
-    await this.cellService.fillCell(gameId, position, currentPlayer.symbol as SymbolEnum);
+    await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol as keyof typeof SymbolEnum]);
 
     const cells = await this.cellService.getCellsByGame(gameId);
     const gameState = this.checkGameState(cells);
@@ -110,7 +116,7 @@ export class BoardService {
     return isDraw ? GameStateEnum.DRAW : GameStateEnum.ONGOING;
   }
 
-  async getGameBoard(gameId: number): Promise<any[]> {
+  async getGameBoard(gameId: number): Promise<CellResponseDto[]> {
     return await this.cellService.getCellsByGame(gameId);
   }
 
