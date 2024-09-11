@@ -3,9 +3,9 @@ import { BoardService } from '../services/board.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CellResponseDto } from '../dtos/cell-response.dto';
-import { PlayerGameResponseDto } from '../dtos/player-game-response.dto';
 import { JoinPlayerRequestDto } from '../dtos/join-player-request.dto';
 import { LeaveGameRequestDto } from '../dtos/leave-game-request.dto';
+import { BoardResponseDto } from '../dtos/board-response.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -30,7 +30,7 @@ export class BoardController {
   }
 
   @Post()
-  async create(@Body() joinPlayerRequestDto: JoinPlayerRequestDto): Promise<PlayerGameResponseDto> {
+  async create(@Body() joinPlayerRequestDto: JoinPlayerRequestDto): Promise<BoardResponseDto> {
     return await this.boardService.create(joinPlayerRequestDto.playerId);
   }
 
@@ -38,7 +38,7 @@ export class BoardController {
   async joinPlayer(
     @Param('boardId', ParseIntPipe) boardId: number,
     @Body() joinPlayerRequestDto: JoinPlayerRequestDto,
-  ): Promise<PlayerGameResponseDto> {
+  ): Promise<BoardResponseDto> {
     return await this.boardService.joinPlayer(boardId, joinPlayerRequestDto.playerId);
   }
 

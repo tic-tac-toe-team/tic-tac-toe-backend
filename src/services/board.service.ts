@@ -5,8 +5,8 @@ import { GameStateEnum } from '../enums/game-state.enum';
 import { CellService } from './cell.service';
 import { PlayerGameService } from './player-game.service';
 import { CellResponseDto } from '../dtos/cell-response.dto';
-import { PlayerGameResponseDto } from '../dtos/player-game-response.dto';
 import { DtoMapperService } from './dto-mapper.service';
+import { BoardResponseDto } from '../dtos/board-response.dto';
 
 @Injectable()
 export class BoardService {
@@ -21,7 +21,7 @@ export class BoardService {
     return this.boardRepository.getAllGames();
   }
 
-  async create(playerId: number): Promise<PlayerGameResponseDto> {
+  async create(playerId: number): Promise<BoardResponseDto> {
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
 
     const playerGame = await this.playerGameService.create({
@@ -36,10 +36,10 @@ export class BoardService {
     const players = [playerGame];
     const cells = await this.cellService.getCellsByGame(game.id);
 
-    return this.dtoMapperService.mapGameToPlayerGameResponseDto(game, players, cells);
+    return this.dtoMapperService.mapToBoardResponseDto(game, players, cells);
   }
 
-  async joinPlayer(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
+  async joinPlayer(gameId: number, playerId: number): Promise<BoardResponseDto> {
     const game = await this.boardRepository.getGameById(gameId);
     const players = await this.playerGameService.getPlayersInGame(gameId);
     const cells = await this.cellService.getCellsByGame(gameId);
@@ -59,7 +59,7 @@ export class BoardService {
 
     players.push(playerGame);
 
-    return this.dtoMapperService.mapGameToPlayerGameResponseDto(game, players, cells);
+    return this.dtoMapperService.mapToBoardResponseDto(game, players, cells);
   }
 
   async leaveGame(gameId: number, playerId: number): Promise<void> {

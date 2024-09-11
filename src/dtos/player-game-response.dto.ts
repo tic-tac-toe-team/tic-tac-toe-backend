@@ -1,12 +1,8 @@
 export class PlayerGameResponseDto {
-  game: GameDto;
-  players: PlayerDto[];
-}
-
-export class GameDto {
-  id: number;
+  gameId: number;
   state: string;
   cells: CellDto[];
+  players: PlayerDto[];
 }
 
 export class PlayerDto {
