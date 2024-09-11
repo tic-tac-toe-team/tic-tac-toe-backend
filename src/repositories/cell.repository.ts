@@ -8,7 +8,11 @@ export class CellRepository {
 
   async createCell(gameId: number, position: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.create({
-      data: { position, symbol: SymbolEnum[symbol], gameId },
+      data: {
+        position,
+        gameId,
+        symbol: symbol.toString(),
+      },
     });
   }
 
@@ -20,7 +24,10 @@ export class CellRepository {
 
   async getCell(gameId: number, position: number): Promise<any> {
     return this.prisma.cell.findFirst({
-      where: { gameId, position },
+      where: {
+        gameId: gameId,
+        position: position,
+      },
     });
   }
 
@@ -33,14 +40,14 @@ export class CellRepository {
   async updateCell(id: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.update({
       where: { id },
-      data: { symbol: SymbolEnum[symbol] },
+      data: { symbol: symbol.toString() },
     });
   }
 
   async updateCells(gameId: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.updateMany({
       where: { gameId },
-      data: { symbol: SymbolEnum[symbol] },
+      data: { symbol: symbol.toString() },
     });
   }
 

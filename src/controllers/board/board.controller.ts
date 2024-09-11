@@ -2,8 +2,9 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { BoardService } from '../../services/board/board.service';
 import { Player } from '@prisma/client';
 import { CreateGameResponseDto } from '../../dtos/create-game-response.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CreateGameDto } from '../../dtos/create-game-request.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -13,16 +14,25 @@ export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @Post('create')
-  async createNewGame(@Body('players') players: Player[]): Promise<CreateGameResponseDto> {
-    return this.boardService.createGame(players);
+  @ApiBody({ type: CreateGameDto })
+  async createNewGame(@Body() createGameDto: CreateGameDto): Promise<CreateGameResponseDto> {
+    return this.boardService.createGame(createGameDto.playerOneId, createGameDto.playerTwoId);
   }
 
-  @Post(':gameId/move')
+  @Get('all')
+  async getAllGames(): Promise<any[]> {
+    return this.boardService.getAllGames();
+  }
+
+  @Post(':gameId/position/move')
   async makeMove(
-    @Param('gameId') gameId: number,
-    @Body('position') position: number,
+    @Param('gameId') gameId: string,
+    @Param('position') position: string,
   ): Promise<void> {
-    await this.boardService.makeMove(gameId, position);
+    const parsedGameId = parseInt(gameId, 10);
+    const parsedPosition = parseInt(position, 10);
+
+    await this.boardService.makeMove(parsedGameId, parsedPosition);
   }
 
   @Post(':gameId/restart')
@@ -31,12 +41,12 @@ export class BoardController {
   }
 
   @Get(':gameId')
-  async getGameBoard(@Param('gameId') gameId: number): Promise<any[]> {
-    return this.boardService.getGameBoard(gameId);
+  async getGameBoard(@Param('gameId') gameId: string): Promise<any[]> {
+    return this.boardService.getGameBoard(parseInt(gameId, 10));
   }
 
   @Get(':gameId/state')
-  async getGameState(@Param('gameId') gameId: number): Promise<any> {
-    return this.boardService.getGameState(gameId);
+  async getGameState(@Param('gameId') gameId: string): Promise<any> {
+    return this.boardService.getGameState(parseInt(gameId, 10));
   }
 }

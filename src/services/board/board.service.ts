@@ -17,26 +17,48 @@ export class BoardService {
 
   private readonly PLAYERS_COUNT = 2;
 
-  async createGame(players: Player[]): Promise<CreateGameResponseDto> {
-    if (players.length !== this.PLAYERS_COUNT) {
-      throw new BadRequestException(
-        `A game must have exactly ${this.PLAYERS_COUNT} players.`,
-      );
+  async getAllGames(): Promise<any[]> {
+    return this.boardRepository.getAllGames();
+  }
+
+  // async createGame(players: Player[]): Promise<CreateGameResponseDto> {
+  //   if (players.length !== this.PLAYERS_COUNT) {
+  //     throw new BadRequestException(
+  //       `A game must have exactly ${this.PLAYERS_COUNT} players.`,
+  //     );
+  //   }
+  //
+  //   const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
+  //
+  //   await this.addPlayersToGame(game.id, players);
+  //
+  //   await this.cellService.createCellsForNewGame(game.id);
+  //
+  //   return { gameId: game.id };
+  // }
+
+  async createGame(playerOneId: number, playerTwoId: number): Promise<CreateGameResponseDto> {
+    if (!playerOneId || !playerTwoId) {
+      throw new BadRequestException(`The IDs of two players must be transmitted.`);
     }
 
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
 
-    await this.addPlayersToGame(game.id, players);
+    await this.addPlayersToGame(game.id, playerOneId, playerTwoId);
 
     await this.cellService.createCellsForNewGame(game.id);
 
     return { gameId: game.id };
   }
 
-  private async addPlayersToGame(gameId: number, players: Player[]): Promise<void> {
-    await this.playerGameService.createPlayerGame(gameId, players[0].id, SymbolEnum.X, true);
-    await this.playerGameService.createPlayerGame(gameId, players[1].id, SymbolEnum.O, false);
+  private async addPlayersToGame(gameId: number, playerOneId: number, playerTwoId: number): Promise<void> {
+    await this.playerGameService.createPlayerGame(gameId, playerOneId, SymbolEnum.X, true);
+    await this.playerGameService.createPlayerGame(gameId, playerTwoId, SymbolEnum.O, false);
   }
+  // private async addPlayersToGame(gameId: number, players: Player[]): Promise<void> {
+  //   await this.playerGameService.createPlayerGame(gameId, players[0].id, SymbolEnum.X, true);
+  //   await this.playerGameService.createPlayerGame(gameId, players[1].id, SymbolEnum.O, false);
+  // }
 
   async makeMove(gameId: number, position: number): Promise<void> {
     const game = await this.boardRepository.getGameById(gameId);
@@ -47,7 +69,7 @@ export class BoardService {
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
 
-    await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol as keyof typeof SymbolEnum]);
+    await this.cellService.fillCell(gameId, position, currentPlayer.symbol as SymbolEnum);
 
     const cells = await this.cellService.getCellsByGame(gameId);
     const gameState = this.checkGameState(cells);
