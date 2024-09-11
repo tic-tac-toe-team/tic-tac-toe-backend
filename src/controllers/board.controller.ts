@@ -30,16 +30,16 @@ export class BoardController {
   }
 
   @Post()
-  async createGame(@Body() joinPlayerRequestDto: JoinPlayerRequestDto): Promise<PlayerGameResponseDto> {
-    return await this.boardService.createGame(joinPlayerRequestDto.playerId);
+  async create(@Body() joinPlayerRequestDto: JoinPlayerRequestDto): Promise<PlayerGameResponseDto> {
+    return await this.boardService.create(joinPlayerRequestDto.playerId);
   }
 
   @Post(':boardId/join')
-  async joinPlayerToGame(
+  async joinPlayer(
     @Param('boardId', ParseIntPipe) boardId: number,
     @Body() joinPlayerRequestDto: JoinPlayerRequestDto,
   ): Promise<PlayerGameResponseDto> {
-    return await this.boardService.joinPlayerToGame(boardId, joinPlayerRequestDto.playerId);
+    return await this.boardService.joinPlayer(boardId, joinPlayerRequestDto.playerId);
   }
 
   @Post(':boardId/leave')

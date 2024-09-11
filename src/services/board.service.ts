@@ -6,12 +6,14 @@ import { CellService } from './cell.service';
 import { PlayerGameService } from './player-game.service';
 import { CellResponseDto } from '../dtos/cell-response.dto';
 import { PlayerGameResponseDto } from '../dtos/player-game-response.dto';
+import { DtoMapperService } from './dto-mapper.service';
 
 @Injectable()
 export class BoardService {
   constructor(
     private boardRepository: BoardRepository,
     private cellService: CellService,
+    private dtoMapperService: DtoMapperService,
     private readonly playerGameService: PlayerGameService,
   ) {}
 
@@ -19,34 +21,32 @@ export class BoardService {
     return this.boardRepository.getAllGames();
   }
 
-  async createGame(playerId: number): Promise<PlayerGameResponseDto> {
+  async create(playerId: number): Promise<PlayerGameResponseDto> {
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
 
     const playerGame = await this.playerGameService.create({
       gameId: game.id,
-      playerId: playerId,
+      playerId,
       symbol: SymbolEnum.X,
-      isCurrentPlayer: true,
+      isCurrentPlayer: true
     });
 
     await this.cellService.createCellsForNewGame(game.id);
 
-    return {
-      gameId: game.id,
-      playerId: playerGame.playerId,
-      symbol: playerGame.symbol,
-      isCurrentPlayer: playerGame.isCurrentPlayer,
-    };
+    const players = [playerGame];
+    const cells = await this.cellService.getCellsByGame(game.id);
+
+    return this.dtoMapperService.mapGameToPlayerGameResponseDto(game, players, cells);
   }
 
-  async joinPlayerToGame(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
+  async joinPlayer(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
+    const game = await this.boardRepository.getGameById(gameId);
     const players = await this.playerGameService.getPlayersInGame(gameId);
+    const cells = await this.cellService.getCellsByGame(gameId);
 
     if (players.length >= 2) {
-      throw new BadRequestException('This game already has two players. A third player cannot join.');
+      throw new BadRequestException('This game already has two players.');
     }
-
-    this.playerGameService.checkPlayerInGame(players, playerId);
 
     const symbol = this.playerGameService.determinePlayersSymbol(players);
 
@@ -54,15 +54,12 @@ export class BoardService {
       gameId,
       playerId,
       symbol,
-      isCurrentPlayer: false,
+      isCurrentPlayer: false
     });
 
-    return {
-      gameId: playerGame.gameId,
-      playerId: playerGame.playerId,
-      symbol: playerGame.symbol,
-      isCurrentPlayer: playerGame.isCurrentPlayer,
-    };
+    players.push(playerGame);
+
+    return this.dtoMapperService.mapGameToPlayerGameResponseDto(game, players, cells);
   }
 
   async leaveGame(gameId: number, playerId: number): Promise<void> {
