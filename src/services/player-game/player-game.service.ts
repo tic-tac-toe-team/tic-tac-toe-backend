@@ -50,6 +50,22 @@ export class PlayerGameService {
     return await this.playerGameRepository.findAllPlayersByGameId(gameId);
   }
 
+  checkPlayerInGame(players: PlayerGame[], playerId: number): void {
+    const isPlayerAlreadyInGame = players.some(player => player.playerId === playerId);
+
+    if (isPlayerAlreadyInGame) {
+      throw new BadRequestException('This player is already part of the game.');
+    }
+  }
+
+  determinePlayerSymbol(players: PlayerGame[]): SymbolEnum {
+    const isSinglePlayerInGame = players.length === 1;
+
+    return isSinglePlayerInGame
+      ? (players[0].symbol === SymbolEnum.X ? SymbolEnum.O : SymbolEnum.X)
+      : SymbolEnum.X;
+  }
+
   async removeFromGame(gameId: number, playerId: number): Promise<{ message: string }> {
     const playerGame = await this.playerGameRepository.findPlayerGameByGameAndPlayer(gameId, playerId);
 

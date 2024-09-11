@@ -45,22 +45,20 @@ export class BoardService {
   }
 
   async joinGame(gameId: number, playerId: number): Promise<PlayerGameResponseDto> {
-    const playersInGame = await this.playerGameService.getPlayersInGame(gameId);
+    const players = await this.playerGameService.getPlayersInGame(gameId);
 
-    if (playersInGame.length >= 2) {
+    if (players.length >= 2) {
       throw new BadRequestException('This game already has two players. A third player cannot join.');
     }
 
-    const isPlayerAlreadyInGame = playersInGame.some(player => player.playerId === playerId);
+    this.playerGameService.checkPlayerInGame(players, playerId);
 
-    if (isPlayerAlreadyInGame) {
-      throw new BadRequestException('This player is already part of the game.');
-    }
+    const symbol = this.playerGameService.determinePlayerSymbol(players);
 
     const playerGame = await this.playerGameService.createPlayerGame({
       gameId,
       playerId,
-      symbol: SymbolEnum.O,
+      symbol,
       isCurrentPlayer: false,
     });
 
