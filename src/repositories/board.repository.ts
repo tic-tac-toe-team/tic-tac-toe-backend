@@ -15,6 +15,10 @@ export class BoardRepository {
     });
   }
 
+  async getAllGames(): Promise<any[]> {
+    return this.prisma.game.findMany();
+  }
+
   async getGameById(id: number): Promise<Game> {
     return this.prisma.game.findUnique({
       where: { id },
