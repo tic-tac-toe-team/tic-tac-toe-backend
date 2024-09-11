@@ -33,14 +33,14 @@ export class CellRepository {
   async updateCell(id: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.update({
       where: { id },
-      data: { symbol: SymbolEnum[symbol] },
+      data: { symbol: symbol },
     });
   }
 
   async updateCells(gameId: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.updateMany({
       where: { gameId },
-      data: { symbol: SymbolEnum[symbol] },
+      data: { symbol: symbol },
     });
   }
 

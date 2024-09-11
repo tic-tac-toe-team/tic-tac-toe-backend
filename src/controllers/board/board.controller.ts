@@ -12,6 +12,12 @@ import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
+  @Get('all')
+  async getAllGames(): Promise<any[]> {
+    return this.boardService.getAllGames();
+  }
+
+
   @Post('create/:playerId')
   async createGame(@Param('playerId', ParseIntPipe) playerId: number): Promise<PlayerGameResponseDto> {
     return await this.boardService.createGame(playerId);
@@ -33,17 +39,19 @@ export class BoardController {
     return await this.boardService.leaveGame(gameId, playerId);
   }
 
-  @Post(':gameId/move')
+  @Post(':gameId/:position/move')
   async makeMove(
-    @Param('gameId') gameId: number,
-    @Body('position') position: number,
+    @Param('gameId', ParseIntPipe) gameId: number,
+    @Param('position', ParseIntPipe) position: number,
   ): Promise<void> {
     await this.boardService.makeMove(gameId, position);
   }
 
   @Post(':gameId/restart')
-  async resetGame(@Param('gameId') gameId: number): Promise<void> {
-    await this.boardService.resetGame(gameId);
+  async resetGame(@Param('gameId', ParseIntPipe) gameId: number): Promise<{ message: string }> {
+    const message = await this.boardService.resetGame(gameId);
+
+    return { message };
   }
 
   @Get(':gameId')
@@ -52,7 +60,7 @@ export class BoardController {
   }
 
   @Get(':gameId/state')
-  async getGameState(@Param('gameId') gameId: number): Promise<any> {
+  async getGameState(@Param('gameId', ParseIntPipe) gameId: number): Promise<any> {
     return this.boardService.getGameState(gameId);
   }
 }

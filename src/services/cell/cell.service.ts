@@ -29,6 +29,6 @@ export class CellService {
   }
 
   async getCellsByGame(gameId: number): Promise<CellResponseDto[]> {
-    return  await this.cellRepository.getCellsByGame(gameId);
+    return await this.cellRepository.getCellsByGame(gameId);
   }
 }

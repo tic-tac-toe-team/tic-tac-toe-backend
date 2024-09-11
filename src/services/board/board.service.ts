@@ -6,7 +6,6 @@ import { CellService } from '../cell/cell.service';
 import { PlayerGameService } from '../player-game/player-game.service';
 import { CellResponseDto } from '../../dtos/cell-response.dto';
 import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
-import { BoardResponseDto } from '../../dtos/board-response.dto';
 
 @Injectable()
 export class BoardService {
@@ -15,6 +14,10 @@ export class BoardService {
     private cellService: CellService,
     private readonly playerGameService: PlayerGameService,
   ) {}
+
+  async getAllGames(): Promise<any[]> {
+    return this.boardRepository.getAllGames();
+  }
 
   async createGame(playerId: number): Promise<PlayerGameResponseDto> {
     const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
@@ -75,7 +78,7 @@ export class BoardService {
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
 
-    await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol as keyof typeof SymbolEnum]);
+    await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol]);
 
     const cells = await this.cellService.getCellsByGame(gameId);
     const gameState = this.checkGameState(cells);
@@ -126,8 +129,10 @@ export class BoardService {
     return game.state;
   }
 
-  async resetGame(gameId: number): Promise<void> {
+  async resetGame(gameId: number): Promise<string> {
     await this.boardRepository.updateGameState(gameId, GameStateEnum.ONGOING);
     await this.cellService.resetCells(gameId);
+
+    return 'Game has been reset successfully';
   }
 }
