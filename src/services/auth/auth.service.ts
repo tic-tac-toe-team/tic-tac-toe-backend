@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PlayerService } from '../player/player.service';
-import { CreatePlayerDto } from '../../dtos/create-player.dto';
+import { CreatePlayerRequestDto } from '../../dtos/create-player-request.dto';
 import { LoginRequestDto } from '../../dtos/login-request.dto';
-import { Player } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { CryptoService } from '../crypto.service';
 import { LoginResponseDto } from '../../dtos/login-response.dto';
+import { CreatePlayerResponseDto } from '../../dtos/create-player-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,18 +15,24 @@ export class AuthService {
     private readonly cryptoService: CryptoService,
   ) {}
 
-  async register(createPlayerDto: CreatePlayerDto): Promise<Player> {
-    const existingPlayer = await this.playerService.getByUsername(
-      createPlayerDto.username,
-    );
+  async register(createPlayerDto: CreatePlayerRequestDto): Promise<CreatePlayerResponseDto> {
+    const existingPlayer = await this.playerService.getByUsername(createPlayerDto.username);
 
     if (existingPlayer) {
       throw new BadRequestException('Username already exists');
     }
 
-    createPlayerDto.password = await this.cryptoService.hashPassword(createPlayerDto.password);
+    const hashedPassword = await this.cryptoService.hashPassword(createPlayerDto.password);
 
-    return this.playerService.create(createPlayerDto);
+    const player = await this.playerService.create({
+      username: createPlayerDto.username,
+      password: hashedPassword,
+    });
+
+    return {
+      id: player.id,
+      username: player.username,
+    };
   }
 
   async login(loginPlayerDto: LoginRequestDto): Promise<LoginResponseDto> {
@@ -50,6 +56,10 @@ export class AuthService {
     const payload = { username: player.username, sub: player.id };
     const access_token = this.jwtService.sign(payload);
 
-    return new LoginResponseDto(player.id, player.username, access_token);
+    return {
+      id: player.id,
+      username: player.username,
+      access_token: access_token,
+    };
   }
 }

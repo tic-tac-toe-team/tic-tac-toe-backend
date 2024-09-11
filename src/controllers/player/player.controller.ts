@@ -13,16 +13,12 @@ export class PlayerController {
 
   @Get(':id')
   public async getById(@Param('id', ParseIntPipe) id: number): Promise<PlayerResponseDto> {
-    const player = await this.playerService.getById(id);
+    return await this.playerService.getById(id);
 
-    return new PlayerResponseDto(player.id, player.username);
   }
 
   @Get()
   public async getAll(): Promise<PlayerResponseDto[]> {
-    const players = await this.playerService.getAll();
-
-    return players.map(player => new PlayerResponseDto(player.id, player.username));
+    return  this.playerService.getAll();
   }
 }
-

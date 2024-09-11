@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PlayerRepository } from '../../repositories/player.repository';
 import { Player } from '@prisma/client';
-import { CreatePlayerDto } from '../../dtos/create-player.dto';
+import { CreatePlayerRequestDto } from '../../dtos/create-player-request.dto';
 
 @Injectable()
 export class PlayerService {
@@ -19,7 +19,7 @@ export class PlayerService {
     return this.playerRepository.findAll();
   }
 
-  async create(createPlayerDto: CreatePlayerDto): Promise<Player> {
+  async create(createPlayerDto: CreatePlayerRequestDto): Promise<Player> {
     const { username, password } = createPlayerDto;
 
     return this.playerRepository.create(username, password);
