@@ -49,4 +49,15 @@ export class PlayerGameService {
   async getPlayersInGame(gameId: number): Promise<PlayerGame[]> {
     return await this.playerGameRepository.findAllPlayersByGameId(gameId);
   }
+
+  async removeFromGame(gameId: number, playerId: number): Promise<{ message: string }> {
+    const playerGame = await this.playerGameRepository.findPlayerGameByGameAndPlayer(gameId, playerId);
+
+    if (!playerGame) {
+      throw new BadRequestException('Player not found in this game.');
+    }
+    await this.playerGameRepository.deletePlayerFromGame(gameId, playerId);
+
+    return { message: `Player with ID ${playerId} successfully left the game with ID ${gameId}` };
+  }
 }

@@ -72,6 +72,10 @@ export class BoardService {
     };
   }
 
+  async leaveGame(gameId: number, playerId: number): Promise<{ message: string }> {
+    return this.playerGameService.removeFromGame(gameId, playerId);
+  }
+
   async makeMove(gameId: number, position: number): Promise<void> {
     const game = await this.boardRepository.getGameById(gameId);
 
