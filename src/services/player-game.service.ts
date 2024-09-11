@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PlayerGame } from '@prisma/client';
-import { PlayerGameRepository } from '../../repositories/player-game.repository';
-import { SymbolEnum } from '../../enums/symbol.enum';
+import { PlayerGameRepository } from '../repositories/player-game.repository';
+import { SymbolEnum } from '../enums/symbol.enum';
 
 @Injectable()
 export class PlayerGameService {

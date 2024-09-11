@@ -1,9 +1,9 @@
 import { Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
-import { BoardService } from '../../services/board/board.service';
+import { BoardService } from '../services/board.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { CellResponseDto } from '../../dtos/cell-response.dto';
-import { PlayerGameResponseDto } from '../../dtos/player-game-response.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { CellResponseDto } from '../dtos/cell-response.dto';
+import { PlayerGameResponseDto } from '../dtos/player-game-response.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)

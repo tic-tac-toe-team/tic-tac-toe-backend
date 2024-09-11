@@ -1,11 +1,11 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthService } from '../../services/auth/auth.service';
-import { CreatePlayerRequestDto } from '../../dtos/create-player-request.dto';
-import { LoginRequestDto } from '../../dtos/login-request.dto';
+import { AuthService } from '../services/auth.service';
+import { CreatePlayerRequestDto } from '../dtos/create-player-request.dto';
+import { LoginRequestDto } from '../dtos/login-request.dto';
 import { Public } from 'src/decorators/public.decorator';
-import { LoginResponseDto } from '../../dtos/login-response.dto';
-import { CreatePlayerResponseDto } from '../../dtos/create-player-response.dto';
+import { LoginResponseDto } from '../dtos/login-response.dto';
+import { CreatePlayerResponseDto } from '../dtos/create-player-response.dto';
 
 @ApiTags('auth')
 @Controller('auth')

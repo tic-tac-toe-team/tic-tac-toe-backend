@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PlayerRepository } from '../../repositories/player.repository';
+import { PlayerRepository } from '../repositories/player.repository';
 import { Player } from '@prisma/client';
-import { CreatePlayerRequestDto } from '../../dtos/create-player-request.dto';
+import { CreatePlayerRequestDto } from '../dtos/create-player-request.dto';
 
 @Injectable()
 export class PlayerService {
