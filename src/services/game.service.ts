@@ -65,7 +65,7 @@ export class GameService {
     const symbol = this.playerGameService.determinePlayersSymbol(players);
 
     const playerGame = await this.playerGameService.create({
-      gameId: gameId,
+      gameId,
       playerId,
       symbol,
       isCurrentPlayer: false,
