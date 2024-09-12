@@ -7,8 +7,13 @@ import { SymbolEnum } from '../enums/symbol.enum';
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
-  async create(data: { gameId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
-    return this.playerGameRepository.createPlayerGame(data);
+  async create(data: { boardId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
+    return this.playerGameRepository.createPlayerGame({
+      gameId: data.boardId,
+      playerId: data.playerId,
+      symbol: data.symbol,
+      isCurrentPlayer: data.isCurrentPlayer
+    });
   }
 
   async changeCurrentPlayer(gameId: number): Promise<PlayerGame> {
@@ -46,19 +51,11 @@ export class PlayerGameService {
     return currentPlayer;
   }
 
-  async getPlayersInGame(gameId: number): Promise<PlayerGame[]> {
+  async getAllPlayers(gameId: number): Promise<PlayerGame[]> {
     return await this.playerGameRepository.findAllPlayersByGameId(gameId);
   }
 
-  checkPlayerInGame(players: PlayerGame[], playerId: number): void {
-    const isPlayerAlreadyInGame = players.some(player => player.playerId === playerId);
-
-    if (isPlayerAlreadyInGame) {
-      throw new BadRequestException('This player is already part of the game.');
-    }
-  }
-
-  determinePlayerSymbol(players: PlayerGame[]): SymbolEnum {
+  determinePlayersSymbol(players: PlayerGame[]): SymbolEnum {
     const isSinglePlayerInGame = players.length === 1;
 
     return isSinglePlayerInGame
@@ -66,14 +63,13 @@ export class PlayerGameService {
       : SymbolEnum.X;
   }
 
-  async removeFromGame(gameId: number, playerId: number): Promise<{ message: string }> {
-    const playerGame = await this.playerGameRepository.findByGameIdAndPlayerId(gameId, playerId);
+  async deletePlayer(boardId: number, playerId: number): Promise<void> {
+    const existPlayers = await this.playerGameRepository.findAllPlayersByGameId(boardId);
 
-    if (!playerGame) {
+    if (!existPlayers) {
       throw new BadRequestException('Player not found in this game.');
     }
-    await this.playerGameRepository.deletePlayerFromGame(gameId, playerId);
 
-    return { message: `Player with ID ${playerId} successfully left the game with ID ${gameId}` };
+    await this.playerGameRepository.delete(boardId, playerId);
   }
 }
