@@ -55,14 +55,6 @@ export class PlayerGameService {
     return await this.playerGameRepository.findAllPlayersByGameId(gameId);
   }
 
-  checkPlayerInGame(players: PlayerGame[], playerId: number): void {
-    const isPlayerAlreadyInGame = players.some(player => player.playerId === playerId);
-
-    if (isPlayerAlreadyInGame) {
-      throw new BadRequestException('This player is already part of the game.');
-    }
-  }
-
   determinePlayersSymbol(players: PlayerGame[]): SymbolEnum {
     const isSinglePlayerInGame = players.length === 1;
 
@@ -71,14 +63,13 @@ export class PlayerGameService {
       : SymbolEnum.X;
   }
 
-  async removeFromGame(gameId: number, playerId: number): Promise<{ message: string }> {
-    const playerGame = await this.playerGameRepository.findByGameIdAndPlayerId(gameId, playerId);
+  async deletePlayer(boardId: number, playerId: number): Promise<void> {
+    const existPlayers = await this.playerGameRepository.findAllPlayersByGameId(boardId);
 
-    if (!playerGame) {
+    if (!existPlayers) {
       throw new BadRequestException('Player not found in this game.');
     }
-    await this.playerGameRepository.deletePlayerFromGame(gameId, playerId);
 
-    return { message: `Player with ID ${playerId} successfully left the game with ID ${gameId}` };
+    await this.playerGameRepository.delete(boardId, playerId);
   }
 }

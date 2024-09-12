@@ -31,4 +31,14 @@ export class BoardRepository {
       data: { state },
     });
   }
+
+  async delete(boardId: number): Promise<void> {
+    await this.prisma.cell.deleteMany({
+      where: { gameId: boardId },
+    });
+
+    await this.prisma.game.delete({
+      where: { id: boardId },
+    });
+  }
 }

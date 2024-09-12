@@ -66,8 +66,14 @@ export class BoardService {
     return this.dtoMapperService.mapToBoardResponseDto(board, players, cells);
   }
 
-  async leaveGame(gameId: number, playerId: number): Promise<void> {
-    // return this.playerGameService.removeFromGame(gameId, playerId);
+  async leaveGame(boardId: number, playerId: number): Promise<void> {
+    await this.playerGameService.deletePlayer(boardId, playerId);
+
+    const existPlayers = await this.playerGameService.getAllPlayers(boardId);
+
+    if (!existPlayers) {
+      await this.boardRepository.delete(boardId);
+    }
   }
 
   async makeMove(gameId: number, position: number): Promise<void> {

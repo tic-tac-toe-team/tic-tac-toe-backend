@@ -12,12 +12,6 @@ export class PlayerGameRepository {
     });
   }
 
-  async findByGameIdAndPlayerId(gameId: number, playerId: number): Promise<PlayerGame | null> {
-    return this.prisma.playerGame.findFirst({
-      where: { gameId, playerId },
-    });
-  }
-
   async findAllPlayersByGameId(gameId: number): Promise<PlayerGame[]> {
     return this.prisma.playerGame.findMany({
       where: { gameId },
@@ -31,12 +25,14 @@ export class PlayerGameRepository {
     });
   }
 
-  async deletePlayerFromGame(gameId: number, playerId: number): Promise<void> {
-    await this.prisma.playerGame.deleteMany({
+  async delete(boardId: number, playerId: number): Promise<void> {
+    await this.prisma.playerGame.delete({
       where: {
-        gameId,
-        playerId,
-      },
+        playerGame: {
+          gameId: boardId,
+          playerId: playerId,
+        },
+      }
     });
   }
 }
