@@ -25,9 +25,11 @@ export class CellRepository {
   }
 
   async getCellsByGame(gameId: number): Promise<any[]> {
-    return this.prisma.cell.findMany({
+    const cells = await this.prisma.cell.findMany({
       where: { gameId },
     });
+
+    return cells.sort((a, b) => a.position - b.position);
   }
 
   async updateCell(id: number, symbol: SymbolEnum): Promise<any> {

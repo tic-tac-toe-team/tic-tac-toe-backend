@@ -17,7 +17,7 @@ model Game {
 model Cell {
   id       Int    @id @default(autoincrement())
   position Int
-  symbol   String
+  symbol   String?
   gameId   Int
   game     Game   @relation(fields: [gameId], references: [id])
 }
@@ -32,7 +32,7 @@ model Player {
 model PlayerGame {
   id              Int     @id @default(autoincrement())
   isCurrentPlayer Boolean
-  symbol          String
+  symbol          String?
   gameId          Int
   game            Game    @relation(fields: [gameId], references: [id])
   playerId        Int

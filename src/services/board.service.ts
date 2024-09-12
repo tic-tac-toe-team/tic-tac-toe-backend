@@ -69,7 +69,7 @@ export class BoardService {
     return this.playerGameService.removeFromGame(gameId, playerId);
   }
 
-  async makeMove(gameId: number, position: number): Promise<void> {
+  async makeMove(gameId: number, position: number): Promise<CellResponseDto[]> {
     const game = await this.boardRepository.getGameById(gameId);
 
     if (game.state !== GameStateEnum.ONGOING) {
@@ -88,6 +88,8 @@ export class BoardService {
     if (gameState === GameStateEnum.ONGOING) {
       await this.playerGameService.changeCurrentPlayer(gameId);
     }
+
+    return cells;
   }
 
   private checkGameState(cells: any[]): GameStateEnum {
@@ -106,7 +108,7 @@ export class BoardService {
       const [a, b, c] = combination;
 
       if (
-        cells[a].symbol !== SymbolEnum.NULL &&
+        cells[a].symbol !== '' &&
         cells[a].symbol === cells[b].symbol &&
         cells[a].symbol === cells[c].symbol
       ) {
@@ -114,13 +116,13 @@ export class BoardService {
       }
     }
 
-    const isDraw = cells.every((cell) => cell.symbol !== SymbolEnum.NULL);
+    const isDraw = cells.every((cell) => cell.symbol !== '');
 
     return isDraw ? GameStateEnum.DRAW : GameStateEnum.ONGOING;
   }
 
-  async getGameBoard(gameId: number): Promise<CellResponseDto[]> {
-    return await this.cellService.getCellsByGame(gameId);
+  async getGameBoard(gameId: number): Promise<any[]> {
+    return await this.boardRepository.getGameById(gameId);
   }
 
   async getGameState(gameId: number): Promise<string> {
