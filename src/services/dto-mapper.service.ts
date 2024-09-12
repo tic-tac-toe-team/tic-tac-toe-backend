@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Game, PlayerGame, Cell } from '@prisma/client';
-import { BoardResponseDto, CellDto, PlayerDto } from '../dtos/board-response.dto';
+import { GameResponseDto, CellDto, PlayerDto } from '../dtos/game-response.dto';
 
 @Injectable()
 export class DtoMapperService {
-  mapToBoardResponseDto(game: Game, players: PlayerGame[], cells: Cell[]): BoardResponseDto {
+  mapToGameResponseDto(game: Game, players: PlayerGame[], cells: Cell[]): GameResponseDto {
     return {
       gameId: game.id,
       state: game.state,
-      cells: cells.map(cell => this.mapToCellDto(cell)),
-      players: players.map(player => this.mapToPlayerDto(player)),
+      cells: cells.map((cell) => this.mapToCellDto(cell)),
+      players: players.map((player) => this.mapToPlayerDto(player)),
     };
   }
 
@@ -17,7 +17,7 @@ export class DtoMapperService {
     return {
       id: cell.id,
       position: cell.position,
-      symbol: cell.symbol
+      symbol: cell.symbol,
     };
   }
 
@@ -25,7 +25,7 @@ export class DtoMapperService {
     return {
       playerId: player.playerId,
       symbol: player.symbol,
-      isCurrent: player.isCurrentPlayer
+      isCurrent: player.isCurrentPlayer,
     };
   }
 }

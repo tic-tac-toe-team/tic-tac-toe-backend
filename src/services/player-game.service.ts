@@ -7,12 +7,12 @@ import { SymbolEnum } from '../enums/symbol.enum';
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
-  async create(data: { boardId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
+  async create(data: { gameId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
     return this.playerGameRepository.createPlayerGame({
-      gameId: data.boardId,
+      gameId: data.gameId,
       playerId: data.playerId,
       symbol: data.symbol,
-      isCurrentPlayer: data.isCurrentPlayer
+      isCurrentPlayer: data.isCurrentPlayer,
     });
   }
 
@@ -63,13 +63,13 @@ export class PlayerGameService {
       : SymbolEnum.X;
   }
 
-  async deletePlayer(boardId: number, playerId: number): Promise<void> {
-    const existPlayers = await this.playerGameRepository.findAllPlayersByGameId(boardId);
+  async deletePlayer(gameId: number, playerId: number): Promise<void> {
+    const existPlayers = await this.playerGameRepository.findAllPlayersByGameId(gameId);
 
     if (!existPlayers) {
       throw new BadRequestException('Player not found in this game.');
     }
 
-    await this.playerGameRepository.delete(boardId, playerId);
+    await this.playerGameRepository.delete(gameId, playerId);
   }
 }

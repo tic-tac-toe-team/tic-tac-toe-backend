@@ -28,7 +28,7 @@ export class CellService {
     }
   }
 
-  async getAllByBoardId(boardId: number): Promise<CellResponseDto[]> {
-    return await this.cellRepository.getCellsByGame(boardId);
+  async getAllByGameId(gameId: number): Promise<CellResponseDto[]> {
+    return await this.cellRepository.getCellsByGame(gameId);
   }
 }

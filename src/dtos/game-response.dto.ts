@@ -1,4 +1,4 @@
-export class BoardResponseDto {
+export class GameResponseDto {
   gameId: number;
   state: string;
   cells: CellDto[];

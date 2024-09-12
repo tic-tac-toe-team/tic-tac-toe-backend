@@ -13,9 +13,9 @@ import { JwtStrategy } from './services/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CryptoService } from './services/crypto.service';
-import { BoardController } from './controllers/board.controller';
-import { BoardService } from './services/board.service';
-import { BoardRepository } from './repositories/board.repository';
+import { GameController } from './controllers/game.controller';
+import { GameService } from './services/game.service';
+import { GameRepository } from './repositories/game.repository';
 import { CellRepository } from './repositories/cell.repository';
 import { PlayerGameRepository } from './repositories/player-game.repository';
 import { CellService } from './services/cell.service';
@@ -25,12 +25,12 @@ import { DtoMapperService } from './services/dto-mapper.service';
 const controllers = [
   PlayerController,
   AuthController,
-  BoardController,
+  GameController,
 ];
 
 const repositories = [
   PlayerRepository,
-  BoardRepository,
+  GameRepository,
   CellRepository,
   PlayerGameRepository
 ];
@@ -43,7 +43,7 @@ const services = [
   LocalAuthGuard,
   JwtStrategy,
   CryptoService,
-  BoardService,
+  GameService,
   CellService,
   PlayerGameService,
   DtoMapperService
