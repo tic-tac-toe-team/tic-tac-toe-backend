@@ -6,7 +6,7 @@ import { SymbolEnum } from '../enums/symbol.enum';
 export class CellRepository {
   constructor(private prisma: PrismaService) {}
 
-  async createCell(gameId: number, position: number, symbol: SymbolEnum): Promise<any> {
+  async create(gameId: number, position: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.create({
       data: { position, gameId, symbol },
     });

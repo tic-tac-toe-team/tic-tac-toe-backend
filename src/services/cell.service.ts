@@ -8,9 +8,9 @@ export class CellService {
   private readonly TOTAL_CELLS = 9;
   constructor(private cellRepository: CellRepository) {}
 
-  async createCellsForNewGame(gameId: number): Promise<void> {
+  async create(gameId: number): Promise<void> {
     for (let i = 0; i < this.TOTAL_CELLS; i++) {
-      await this.cellRepository.createCell(gameId, i, SymbolEnum.NULL);
+      await this.cellRepository.create(gameId, i, SymbolEnum.NULL);
     }
   }
 
@@ -28,7 +28,7 @@ export class CellService {
     }
   }
 
-  async getCellsByGame(gameId: number): Promise<CellResponseDto[]> {
-    return await this.cellRepository.getCellsByGame(gameId);
+  async getAllByBoardId(boardId: number): Promise<CellResponseDto[]> {
+    return await this.cellRepository.getCellsByGame(boardId);
   }
 }

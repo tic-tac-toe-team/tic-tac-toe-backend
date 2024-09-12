@@ -7,7 +7,7 @@ import { Game } from '@prisma/client';
 export class BoardRepository {
   constructor(private prisma: PrismaService) {}
 
-  async createGame(state: GameStateEnum): Promise<Game> {
+  async create(state: GameStateEnum): Promise<Game> {
     return this.prisma.game.create({
       data: {
         state,
@@ -31,6 +31,12 @@ export class BoardRepository {
           },
         },
       },
+    });
+  }
+
+  async getBoardById(id: number): Promise<Game> {
+    return this.prisma.game.findUnique({
+      where: { id },
     });
   }
 
@@ -68,6 +74,16 @@ export class BoardRepository {
     return this.prisma.game.update({
       where: { id },
       data: { state },
+    });
+  }
+
+  async delete(boardId: number): Promise<void> {
+    await this.prisma.cell.deleteMany({
+      where: { gameId: boardId },
+    });
+
+    await this.prisma.game.delete({
+      where: { id: boardId },
     });
   }
 }

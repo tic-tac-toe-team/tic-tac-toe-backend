@@ -20,6 +20,7 @@ import { CellRepository } from './repositories/cell.repository';
 import { PlayerGameRepository } from './repositories/player-game.repository';
 import { CellService } from './services/cell.service';
 import { PlayerGameService } from './services/player-game.service';
+import { DtoMapperService } from './services/dto-mapper.service';
 
 const controllers = [
   PlayerController,
@@ -45,6 +46,7 @@ const services = [
   BoardService,
   CellService,
   PlayerGameService,
+  DtoMapperService
 ];
 
 @Module({
