@@ -25,7 +25,7 @@ export class DtoMapperService {
     return {
       playerId: player.playerId,
       symbol: player.symbol,
-      isCurrentPlayer: player.isCurrentPlayer
+      isCurrent: player.isCurrentPlayer
     };
   }
 }

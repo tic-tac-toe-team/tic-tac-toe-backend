@@ -8,7 +8,7 @@ export class BoardResponseDto {
 export class PlayerDto {
   playerId: number;
   symbol: string;
-  isCurrentPlayer: boolean;
+  isCurrent: boolean;
 }
 
 export class CellDto {
