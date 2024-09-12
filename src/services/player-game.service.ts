@@ -7,8 +7,13 @@ import { SymbolEnum } from '../enums/symbol.enum';
 export class PlayerGameService {
   constructor(private readonly playerGameRepository: PlayerGameRepository) {}
 
-  async create(data: { gameId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
-    return this.playerGameRepository.createPlayerGame(data);
+  async create(data: { boardId: number; playerId: number; symbol: SymbolEnum; isCurrentPlayer: boolean }): Promise<PlayerGame> {
+    return this.playerGameRepository.createPlayerGame({
+      gameId: data.boardId,
+      playerId: data.playerId,
+      symbol: data.symbol,
+      isCurrentPlayer: data.isCurrentPlayer
+    });
   }
 
   async changeCurrentPlayer(gameId: number): Promise<PlayerGame> {
@@ -46,7 +51,7 @@ export class PlayerGameService {
     return currentPlayer;
   }
 
-  async getPlayersInGame(gameId: number): Promise<PlayerGame[]> {
+  async getAllPlayers(gameId: number): Promise<PlayerGame[]> {
     return await this.playerGameRepository.findAllPlayersByGameId(gameId);
   }
 

@@ -22,44 +22,48 @@ export class BoardService {
   }
 
   async create(playerId: number): Promise<BoardResponseDto> {
-    const game = await this.boardRepository.createGame(GameStateEnum.ONGOING);
+    const board = await this.boardRepository.create(GameStateEnum.ONGOING);
 
-    const playerGame = await this.playerGameService.create({
-      gameId: game.id,
+    const playerBoard = await this.playerGameService.create({
+      boardId: board.id,
       playerId,
       symbol: SymbolEnum.X,
       isCurrentPlayer: true
     });
 
-    await this.cellService.createCellsForNewGame(game.id);
+    await this.cellService.create(board.id);
 
-    const players = [playerGame];
-    const cells = await this.cellService.getCellsByGame(game.id);
+    const players = [playerBoard];
+    const cells = await this.cellService.getAllByBoardId(board.id);
 
-    return this.dtoMapperService.mapToBoardResponseDto(game, players, cells);
+    return this.dtoMapperService.mapToBoardResponseDto(board, players, cells);
   }
 
-  async joinPlayer(gameId: number, playerId: number): Promise<BoardResponseDto> {
-    const game = await this.boardRepository.getGameById(gameId);
-    const players = await this.playerGameService.getPlayersInGame(gameId);
-    const cells = await this.cellService.getCellsByGame(gameId);
+  async joinPlayer(boardId: number, playerId: number): Promise<BoardResponseDto> {
+    const MAX_PLAYERS = 2;
 
-    if (players.length >= 2) {
+    const players = await this.playerGameService.getAllPlayers(boardId);
+    const playerCount = players.length;
+
+    const board = await this.boardRepository.getBoardById(boardId);
+    const cells = await this.cellService.getAllByBoardId(boardId);
+
+    if (playerCount >= MAX_PLAYERS) {
       throw new BadRequestException('This game already has two players.');
     }
 
     const symbol = this.playerGameService.determinePlayersSymbol(players);
 
-    const playerGame = await this.playerGameService.create({
-      gameId,
+    const playerBoard = await this.playerGameService.create({
+      boardId,
       playerId,
       symbol,
       isCurrentPlayer: false
     });
 
-    players.push(playerGame);
+    players.push(playerBoard);
 
-    return this.dtoMapperService.mapToBoardResponseDto(game, players, cells);
+    return this.dtoMapperService.mapToBoardResponseDto(board, players, cells);
   }
 
   async leaveGame(gameId: number, playerId: number): Promise<void> {
@@ -67,7 +71,7 @@ export class BoardService {
   }
 
   async makeMove(gameId: number, position: number): Promise<void> {
-    const game = await this.boardRepository.getGameById(gameId);
+    const game = await this.boardRepository.getBoardById(gameId);
 
     if (game.state !== GameStateEnum.ONGOING) {
       throw new BadRequestException('Game has already ended');
@@ -77,7 +81,7 @@ export class BoardService {
 
     await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol]);
 
-    const cells = await this.cellService.getCellsByGame(gameId);
+    const cells = await this.cellService.getAllByBoardId(gameId);
     const gameState = this.checkGameState(cells);
 
     await this.boardRepository.updateGameState(gameId, gameState);
@@ -117,11 +121,11 @@ export class BoardService {
   }
 
   async getGameBoard(gameId: number): Promise<CellResponseDto[]> {
-    return await this.cellService.getCellsByGame(gameId);
+    return await this.cellService.getAllByBoardId(gameId);
   }
 
   async getGameState(gameId: number): Promise<string> {
-    const game = await this.boardRepository.getGameById(gameId);
+    const game = await this.boardRepository.getBoardById(gameId);
 
     return game.state;
   }

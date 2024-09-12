@@ -34,17 +34,17 @@ export class BoardController {
     return await this.boardService.create(joinPlayerRequestDto.playerId);
   }
 
-  @Post(':boardId/join')
+  @Post(':id/join')
   async joinPlayer(
-    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('id', ParseIntPipe) boardId: number,
     @Body() joinPlayerRequestDto: JoinPlayerRequestDto,
   ): Promise<BoardResponseDto> {
     return await this.boardService.joinPlayer(boardId, joinPlayerRequestDto.playerId);
   }
 
-  @Post(':boardId/leave')
+  @Post(':id/leave')
   async leaveGame(
-    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('id', ParseIntPipe) boardId: number,
     @Body() leaveGameRequestDto: LeaveGameRequestDto,
   ): Promise<void> {
     return await this.boardService.leaveGame(boardId, leaveGameRequestDto.playerId);
