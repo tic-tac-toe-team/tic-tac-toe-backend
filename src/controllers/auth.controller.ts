@@ -15,7 +15,7 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() createPlayerDto: CreatePlayerRequestDto): Promise<CreatePlayerResponseDto> {
-   return this.authService.register(createPlayerDto);
+    return this.authService.register(createPlayerDto);
   }
 
   @Public()

@@ -4,7 +4,6 @@ import { SymbolEnum } from '../enums/symbol.enum';
 import { GameStateEnum } from '../enums/game-state.enum';
 import { CellService } from './cell.service';
 import { PlayerGameService } from './player-game.service';
-import { CellResponseDto } from '../dtos/cell-response.dto';
 import { DtoMapperService } from './dto-mapper.service';
 import { GameResponseDto } from '../dtos/game-response.dto';
 
@@ -17,13 +16,14 @@ export class GameService {
     private readonly playerGameService: PlayerGameService,
   ) {}
 
-  async getAllGames(): Promise<GameResponseDto[]> {
-    const games = await this.gameRepository.getAllGames();
+  async getAll(): Promise<GameResponseDto[]> {
+    const games = await this.gameRepository.getAll();
 
     const gameDtos = await Promise.all(
       games.map(async (game) => {
         const cells = await this.cellService.getAllByGameId(game.id);
-        const players = await this.playerGameService.getAllPlayers(game.id);
+        const players = await this.playerGameService.getAllPlayersByGameId(game.id);
+
         return this.dtoMapperService.mapToGameResponseDto(game, players, cells);
       }),
     );
@@ -52,17 +52,17 @@ export class GameService {
   async joinPlayer(gameId: number, playerId: number): Promise<GameResponseDto> {
     const MAX_PLAYERS = 2;
 
-    const players = await this.playerGameService.getAllPlayers(gameId);
+    const players = await this.playerGameService.getAllPlayersByGameId(gameId);
     const playerCount = players.length;
 
-    const game = await this.gameRepository.getGameById(gameId);
+    const game = await this.gameRepository.getById(gameId);
     const cells = await this.cellService.getAllByGameId(gameId);
 
     if (playerCount >= MAX_PLAYERS) {
       throw new BadRequestException('This game already has two players.');
     }
 
-    const symbol = this.playerGameService.determinePlayersSymbol(players);
+    const symbol = await this.playerGameService.determinePlayersSymbol(players);
 
     const playerGame = await this.playerGameService.create({
       gameId,
@@ -79,17 +79,17 @@ export class GameService {
   async leaveGame(gameId: number, playerId: number): Promise<void> {
     await this.playerGameService.deletePlayer(gameId, playerId);
 
-    const existPlayers = await this.playerGameService.getAllPlayers(gameId);
+    const existPlayers = await this.playerGameService.getAllPlayersByGameId(gameId);
 
     if (!existPlayers) {
       await this.gameRepository.delete(gameId);
     }
   }
 
-  async makeMove(gameId: number, position: number): Promise<CellResponseDto[]> {
-    const game = await this.gameRepository.getGameById(gameId);
+  async makeMove(gameId: number, position: number): Promise<GameResponseDto> {
+    const currentGameState = await this.getState(gameId);
 
-    if (game.state !== GameStateEnum.ONGOING) {
+    if (currentGameState !== GameStateEnum.ONGOING) {
       throw new BadRequestException('Game has already ended');
     }
 
@@ -100,13 +100,17 @@ export class GameService {
     const cells = await this.cellService.getAllByGameId(gameId);
     const gameState = this.checkGameState(cells);
 
-    await this.gameRepository.updateGameState(gameId, gameState);
+    await this.gameRepository.updateState(gameId, gameState);
+
+    const game = await this.gameRepository.getById(gameId);
 
     if (gameState === GameStateEnum.ONGOING) {
       await this.playerGameService.changeCurrentPlayer(gameId);
     }
 
-    return cells;
+    const players = await this.playerGameService.getAllPlayersByGameId(gameId);
+
+    return this.dtoMapperService.mapToGameResponseDto(game, players, cells);
   }
 
   private checkGameState(cells: any[]): GameStateEnum {
@@ -138,24 +142,23 @@ export class GameService {
     return isDraw ? GameStateEnum.DRAW : GameStateEnum.ONGOING;
   }
 
-  async getGameById(gameId: number): Promise<GameResponseDto> {
-    const game = await this.gameRepository.getGameById(gameId);
+  async getById(gameId: number): Promise<GameResponseDto> {
+    const game = await this.gameRepository.getById(gameId);
     const cells = await this.cellService.getAllByGameId(gameId);
-    const players = await this.playerGameService.getAllPlayers(gameId);
+    const players = await this.playerGameService.getAllPlayersByGameId(gameId);
 
     return this.dtoMapperService.mapToGameResponseDto(game, players, cells);
   }
 
-  async getGameState(gameId: number): Promise<string> {
-    const game = await this.gameRepository.getGameById(gameId);
+  async getState(gameId: number): Promise<string> {
+    const game = await this.gameRepository.getById(gameId);
 
     return game.state;
   }
 
-  async resetGame(gameId: number): Promise<string> {
-    await this.gameRepository.updateGameState(gameId, GameStateEnum.ONGOING);
+  async resetGame(gameId: number): Promise<void> {
+    await this.gameRepository.updateState(gameId, GameStateEnum.ONGOING);
     await this.cellService.resetCells(gameId);
-
-    return 'Game has been reset successfully';
+    await this.playerGameService.setCurrentPlayer(gameId, SymbolEnum.X);
   }
 }

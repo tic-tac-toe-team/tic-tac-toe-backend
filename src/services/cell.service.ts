@@ -15,20 +15,20 @@ export class CellService {
   }
 
   async resetCells(gameId: number): Promise<void> {
-    await this.cellRepository.updateCells(gameId, SymbolEnum.NULL);
+    await this.cellRepository.updateAll(gameId, SymbolEnum.NULL);
   }
 
   async fillCell(gameId: number, position: number, symbol: SymbolEnum): Promise<void> {
-    const cell = await this.cellRepository.getCell(gameId, position);
+    const cell = await this.cellRepository.getByGameIdAndPosition(gameId, position);
 
     if (cell.symbol === SymbolEnum.NULL) {
-      await this.cellRepository.updateCell(cell.id, symbol);
+      await this.cellRepository.update(cell.id, symbol);
     } else {
       throw new Error('Cell is already occupied');
     }
   }
 
   async getAllByGameId(gameId: number): Promise<CellResponseDto[]> {
-    return await this.cellRepository.getCellsByGame(gameId);
+    return await this.cellRepository.getAllByGameId(gameId);
   }
 }

@@ -1,6 +1,6 @@
 import { IsInt } from 'class-validator';
 
-export class MakeMoveDto {
+export class MakeMoveRequestDto {
   @IsInt()
   position: number;
 }

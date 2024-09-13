@@ -15,17 +15,17 @@ export class GameRepository {
     });
   }
 
-  async getAllGames(): Promise<any[]> {
+  async getAll(): Promise<any[]> {
     return this.prisma.game.findMany();
   }
 
-  async getGameById(id: number): Promise<Game> {
+  async getById(id: number): Promise<Game> {
     return this.prisma.game.findUnique({
       where: { id },
     });
   }
 
-  async updateGameState(id: number, state: GameStateEnum): Promise<any> {
+  async updateState(id: number, state: GameStateEnum): Promise<any> {
     return this.prisma.game.update({
       where: { id },
       data: { state },
