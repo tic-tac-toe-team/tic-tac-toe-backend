@@ -10,23 +10,23 @@ generator client {
 model Game {
   id         Int          @id @default(autoincrement())
   state      String       @default("ongoing")
-  Cell       Cell[]
-  PlayerGame PlayerGame[]
+  cell       Cell[]
+  playerGame PlayerGame[]
 }
 
 model Cell {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   position Int
   symbol   String?
   gameId   Int
-  game     Game   @relation(fields: [gameId], references: [id])
+  game     Game    @relation(fields: [gameId], references: [id])
 }
 
 model Player {
   id         Int          @id @default(autoincrement())
   username   String       @unique
   password   String
-  PlayerGame PlayerGame[]
+  playerGame PlayerGame[]
 }
 
 model PlayerGame {
