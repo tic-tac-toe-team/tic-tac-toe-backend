@@ -14,11 +14,10 @@ export class PlayerController {
   @Get(':id')
   public async getById(@Param('id', ParseIntPipe) id: number): Promise<PlayerResponseDto> {
     return await this.playerService.getById(id);
-
   }
 
   @Get()
   public async getAll(): Promise<PlayerResponseDto[]> {
-    return  this.playerService.getAll();
+    return this.playerService.getAll();
   }
 }

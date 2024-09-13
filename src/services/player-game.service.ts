@@ -47,11 +47,33 @@ export class PlayerGameService {
     return currentPlayer;
   }
 
-  async getAllPlayers(gameId: number): Promise<PlayerGame[]> {
+  async setCurrentPlayer(gameId: number, symbol: SymbolEnum): Promise<void> {
+    const players = await this.getAllPlayersByGameId(gameId);
+
+    const currentPlayer = players.find(player => player.symbol === symbol);
+
+    if (!currentPlayer) {
+      throw new NotFoundException(`Player with symbol ${symbol} not found`);
+    }
+
+    await this.update(currentPlayer.id, { isCurrentPlayer: true });
+
+    const otherPlayers = players.filter((player) => player.symbol !== symbol);
+
+    for (const player of otherPlayers) {
+      await this.update(player.id, { isCurrentPlayer: false });
+    }
+  }
+
+  async update(playerId: number, updateData: Partial<PlayerGame>): Promise<PlayerGame> {
+    return this.playerGameRepository.updatePlayerGame(playerId, updateData);
+  }
+
+  async getAllPlayersByGameId(gameId: number): Promise<PlayerGame[]> {
     return await this.playerGameRepository.findAllPlayersByGameId(gameId);
   }
 
-  determinePlayersSymbol(players: PlayerGame[]): SymbolEnum {
+  async determinePlayersSymbol(players: PlayerGame[]): Promise<SymbolEnum> {
     const isSinglePlayerInGame = players.length === 1;
 
     return isSinglePlayerInGame

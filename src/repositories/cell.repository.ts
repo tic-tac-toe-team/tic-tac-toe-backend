@@ -12,19 +12,19 @@ export class CellRepository {
     });
   }
 
-  async getCellById(id: number): Promise<any> {
+  async getById(id: number): Promise<any> {
     return this.prisma.cell.findUnique({
       where: { id },
     });
   }
 
-  async getCell(gameId: number, position: number): Promise<any> {
+  async getByGameIdAndPosition(gameId: number, position: number): Promise<any> {
     return this.prisma.cell.findFirst({
       where: { gameId, position },
     });
   }
 
-  async getCellsByGame(gameId: number): Promise<any[]> {
+  async getAllByGameId(gameId: number): Promise<any[]> {
     const cells = await this.prisma.cell.findMany({
       where: { gameId },
     });
@@ -32,21 +32,21 @@ export class CellRepository {
     return cells.sort((a, b) => a.position - b.position);
   }
 
-  async updateCell(id: number, symbol: SymbolEnum): Promise<any> {
+  async update(id: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.update({
       where: { id },
       data: { symbol: symbol },
     });
   }
 
-  async updateCells(gameId: number, symbol: SymbolEnum): Promise<any> {
+  async updateAll(gameId: number, symbol: SymbolEnum): Promise<any> {
     return this.prisma.cell.updateMany({
       where: { gameId },
       data: { symbol: symbol },
     });
   }
 
-  async deleteCell(id: number): Promise<any> {
+  async delete(id: number): Promise<any> {
     return this.prisma.cell.delete({
       where: { id },
     });

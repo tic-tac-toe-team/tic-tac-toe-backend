@@ -32,7 +32,7 @@ const repositories = [
   PlayerRepository,
   GameRepository,
   CellRepository,
-  PlayerGameRepository
+  PlayerGameRepository,
 ];
 
 const services = [
@@ -46,7 +46,7 @@ const services = [
   GameService,
   CellService,
   PlayerGameService,
-  DtoMapperService
+  DtoMapperService,
 ];
 
 @Module({
