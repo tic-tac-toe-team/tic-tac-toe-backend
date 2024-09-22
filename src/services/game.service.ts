@@ -88,9 +88,14 @@ export class GameService {
 
   async makeMove(gameId: number, position: number): Promise<GameResponseDto> {
     const currentGameState = await this.getState(gameId);
+    const playerCount = await this.playerGameService.getAllPlayersByGameId(gameId);
 
     if (currentGameState !== GameStateEnum.ONGOING) {
       throw new BadRequestException('Game has already ended');
+    }
+
+    if (playerCount.length < 2) {
+      throw new BadRequestException('Cannot make a move without two players in the game.');
     }
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
