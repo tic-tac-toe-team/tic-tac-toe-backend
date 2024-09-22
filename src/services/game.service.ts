@@ -86,7 +86,7 @@ export class GameService {
     }
   }
 
-  async makeMove(gameId: number, position: number): Promise<GameResponseDto> {
+  async makeMove(gameId: number, playerId: number, position: number): Promise<GameResponseDto> {
     const currentGameState = await this.getState(gameId);
     const playerCount = await this.playerGameService.getAllPlayersByGameId(gameId);
 
@@ -99,6 +99,10 @@ export class GameService {
     }
 
     const currentPlayer = await this.playerGameService.getCurrentPlayer(gameId);
+
+    if (currentPlayer.playerId !== playerId) {
+      throw new BadRequestException('It is not your turn to make a move.');
+    }
 
     await this.cellService.fillCell(gameId, position, SymbolEnum[currentPlayer.symbol]);
 

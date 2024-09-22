@@ -55,9 +55,9 @@ export class GameController {
     @Param('id', ParseIntPipe) id: number,
     @Body() makeMoveDto: MakeMoveRequestDto,
   ): Promise<GameResponseDto> {
-    const { position } = makeMoveDto;
+    const { position, playerId } = makeMoveDto;
 
-    return await this.gameService.makeMove(id, position);
+    return await this.gameService.makeMove(id, playerId, position);
   }
 
   @Post(':id/restart')
