@@ -49,6 +49,7 @@ export class GameService {
     return this.dtoMapperService.mapToGameResponseDto(game, players, cells);
   }
 
+
   async joinPlayer(gameId: number, playerId: number): Promise<GameResponseDto> {
     const MAX_PLAYERS = 2;
 
@@ -64,11 +65,17 @@ export class GameService {
 
     const symbol = await this.playerGameService.determinePlayersSymbol(players);
 
+    const currentPlayerExists = players.some(
+      (player) => player.isCurrentPlayer,
+    );
+
+    const isCurrentPlayer = !currentPlayerExists;
+
     const playerGame = await this.playerGameService.create({
       gameId,
       playerId,
       symbol,
-      isCurrentPlayer: false,
+      isCurrentPlayer,
     });
 
     players.push(playerGame);
