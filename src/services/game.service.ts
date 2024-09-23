@@ -81,10 +81,11 @@ export class GameService {
 
     const existPlayers = await this.playerGameService.getAllPlayersByGameId(gameId);
 
-    if (!existPlayers) {
+    if (existPlayers.length === 0) {
       await this.gameRepository.delete(gameId);
     }
   }
+
 
   async makeMove(gameId: number, playerId: number, position: number): Promise<GameResponseDto> {
     const currentGameState = await this.getState(gameId);
