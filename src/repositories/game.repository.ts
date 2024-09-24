@@ -16,7 +16,6 @@ export class GameRepository {
   }
 
   async getAll(): Promise<any[]> {
-    //return this.prisma.game.findMany();
     return this.prisma.game.findMany({
       orderBy: {
         id: 'asc',
