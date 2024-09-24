@@ -49,6 +49,13 @@ export class GameService {
     return this.dtoMapperService.mapToGameResponseDto(game, players, cells);
   }
 
+  private checkCurrentPlayerExists(players: any[]): boolean {
+    const currentPlayerExists = players.some(
+      (player) => player.isCurrentPlayer,
+    );
+
+    return !currentPlayerExists;
+  }
 
   async joinPlayer(gameId: number, playerId: number): Promise<GameResponseDto> {
     const MAX_PLAYERS = 2;
@@ -65,11 +72,7 @@ export class GameService {
 
     const symbol = await this.playerGameService.determinePlayersSymbol(players);
 
-    const currentPlayerExists = players.some(
-      (player) => player.isCurrentPlayer,
-    );
-
-    const isCurrentPlayer = !currentPlayerExists;
+    const isCurrentPlayer = this.checkCurrentPlayerExists(players);
 
     const playerGame = await this.playerGameService.create({
       gameId,
@@ -176,6 +179,12 @@ export class GameService {
   async resetGame(gameId: number): Promise<void> {
     await this.gameRepository.updateState(gameId, GameStateEnum.ONGOING);
     await this.cellService.resetCells(gameId);
-    await this.playerGameService.setCurrentPlayer(gameId, SymbolEnum.X);
+
+    const players = await this.playerGameService.getAllPlayersByGameId(gameId);
+    const symbol = await this.playerGameService.determinePlayersSymbol(players);
+
+    if (!this.checkCurrentPlayerExists(players)) {
+      await this.playerGameService.setCurrentPlayer(gameId, symbol);
+    }
   }
 }
